@@ -1,4 +1,5 @@
 import Logo from "@/sharedComponent/Logo";
+import ThemeToggle from "@/sharedComponent/ThemToggle";
 import Link from "next/link";
 
 const navLinks = (
@@ -51,6 +52,7 @@ export default function AuthNavbar() {
         </div>
         <div className="navbar-end">
           <div className="flex gap-2">
+            <ThemeToggle />
             <Link href="/login" className="btn btn-primary">
               Login
             </Link>

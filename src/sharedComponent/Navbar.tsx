@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Logo from "./Logo";
+import ThemeToggle from "./ThemToggle";
 
 const navLinks = (
   <>
@@ -48,10 +49,11 @@ export default function Navbar() {
         </div>
         <div className="navbar-end">
           <div className="flex gap-2">
-            <Link href="/login" className="btn btn-primary">
+            <ThemeToggle />
+            <Link href="/login" className="btn btn-primary text-neutral">
               Login
             </Link>
-            <Link href="/register" className="btn btn-secondary">
+            <Link href="/register" className="btn btn-secondary text-neutral">
               Register
             </Link>
           </div>
