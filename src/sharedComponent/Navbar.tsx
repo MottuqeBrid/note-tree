@@ -1,18 +1,84 @@
+"use client";
 import Link from "next/link";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemToggle";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
-const navLinks = (
-  <>
-    <li>
-      <Link href="/" className="">
-        Home
-      </Link>
-    </li>
-  </>
-);
+type User = {
+  email?: string;
+  name?: string;
+  photo?: {
+    profile?: string;
+  };
+};
 
 export default function Navbar() {
+  const [user, setUser] = useState<User | null>(null);
+
+  const getUser = async () => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/profile`, {
+      method: "GET",
+      credentials: "include", // very important
+      cache: "no-store",
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      setUser(data?.user);
+    } else {
+      setUser(null);
+    }
+  };
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  const authLink = user ? (
+    <>
+      <div className="btn btn-ghost btn-circle avatar">
+        <div className="w-10 rounded-full">
+          <Image
+            src={
+              user?.photo?.profile ||
+              "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            }
+            alt={user?.name || "profile picture"}
+            width={32}
+            height={32}
+          />
+        </div>
+      </div>
+    </>
+  ) : (
+    <>
+      <Link href="/login" className="btn btn-primary text-neutral">
+        Login
+      </Link>
+      <Link href="/register" className="btn btn-secondary text-neutral">
+        Register
+      </Link>
+    </>
+  );
+  const navLinks = (
+    <>
+      <li>
+        <Link href="/" className="">
+          Home
+        </Link>
+      </li>
+      {user && (
+        <>
+          <li>
+            <Link href="/profile" className="">
+              Profile
+            </Link>
+          </li>
+        </>
+      )}
+    </>
+  );
+
   return (
     <div className="shadow-sm w-full sticky top-0 z-50 bg-transparent">
       <nav className="navbar">
@@ -50,12 +116,7 @@ export default function Navbar() {
         <div className="navbar-end">
           <div className="flex gap-2">
             <ThemeToggle />
-            <Link href="/login" className="btn btn-primary text-neutral">
-              Login
-            </Link>
-            <Link href="/register" className="btn btn-secondary text-neutral">
-              Register
-            </Link>
+            {authLink}
           </div>
         </div>
       </nav>
