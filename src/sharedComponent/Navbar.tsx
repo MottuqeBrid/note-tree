@@ -63,15 +63,15 @@ export default function Navbar() {
   const navLinks = (
     <>
       <li>
-        <Link href="/" className="">
+        <Link href="/" className="font-bold">
           Home
         </Link>
       </li>
       {user && (
         <>
           <li>
-            <Link href="/profile" className="">
-              Profile
+            <Link href="/dashboard" className="">
+              Dashboard
             </Link>
           </li>
         </>
@@ -80,8 +80,8 @@ export default function Navbar() {
   );
 
   return (
-    <div className="shadow-sm w-full sticky top-0 z-50 bg-transparent">
-      <nav className="navbar">
+    <div className="shadow-sm w-full sticky top-0 z-50 bg-base-100/70">
+      <nav className="navbar max-w-7xl mx-auto">
         <div className="navbar-start">
           <div className="dropdown">
             <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
