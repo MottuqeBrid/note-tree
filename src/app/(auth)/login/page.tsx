@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -70,15 +71,17 @@ export default function LoginPage() {
   };
 
   return (
-    <section className="hero bg-base-200 min-h-screen">
+    <section className="hero p-0 bg-base-200 min-h-screen">
       <div className="hero-content flex-col lg:flex-row-reverse gap-8">
         {/* Left Info */}
         <div className="text-center lg:text-left max-w-md">
-          <h1 className="text-5xl font-bold">Login Now!</h1>
-          <p className="py-6 text-gray-600">
-            Access your NoteTree account and continue managing your notes
-            securely.
-          </p>
+          <Image
+            src="/login.png"
+            alt="Login Illustration"
+            className="drop-shadow-accent"
+            width={500}
+            height={500}
+          />
         </div>
 
         {/* Login Card */}
@@ -89,8 +92,13 @@ export default function LoginPage() {
               className="space-y-6"
               noValidate
             >
-              <h2 className="text-2xl font-bold text-center">Welcome Back</h2>
-
+              <div className="text-center">
+                <h2 className="text-2xl font-bold text-center">Login Now!</h2>
+                <p className="py-6 opacity-70">
+                  Access your NoteTree account and continue managing your notes
+                  securely.
+                </p>
+              </div>
               {/* Email */}
               <div>
                 <label

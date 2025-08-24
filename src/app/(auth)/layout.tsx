@@ -1,5 +1,5 @@
 import Footer from "@/sharedComponent/Footer";
-import AuthNavbar from "./authComponent/AuthNavbar";
+import AuthNavbar from "./_authComponent/AuthNavbar";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

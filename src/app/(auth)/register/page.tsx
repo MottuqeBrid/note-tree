@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -87,11 +88,13 @@ export default function RegisterPage() {
       <div className="hero-content flex-col lg:flex-row-reverse gap-8">
         {/* Left Info */}
         <div className="text-center lg:text-left max-w-md">
-          <h1 className="text-5xl font-bold">Register Now!</h1>
-          <p className="py-6 text-gray-600">
-            Join NoteTree today and manage your notes efficiently. Fast,
-            reliable, and secure.
-          </p>
+          <Image
+            src="/signup.png"
+            alt="Register Illustration"
+            className="drop-shadow-accent"
+            width={500}
+            height={500}
+          />
         </div>
 
         {/* Register Card */}
@@ -102,7 +105,13 @@ export default function RegisterPage() {
               className="space-y-6"
               noValidate
             >
-              <h2 className="text-2xl font-bold text-center">Create Account</h2>
+              <div className="text-center">
+                <h2 className="text-2xl font-bold">Create Account</h2>
+                <p className="py-6 opacity-70">
+                  Join NoteTree today and manage your notes efficiently. Fast,
+                  reliable, and secure.
+                </p>
+              </div>
 
               {/* Name */}
               <div>
@@ -161,35 +170,6 @@ export default function RegisterPage() {
               {/* Email */}
               <div>
                 <label />
-                {errors.email && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
-              {/* Email */}
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Email
-                </label>
-                <input
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@example.com"
-                  className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm
-                    focus:outline-none focus:ring-2 focus:ring-blue-500
-                    ${errors.email ? "border-red-500" : "border-gray-300"}`}
-                  {...register("email", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: "Invalid email address",
-                    },
-                  })}
-                />
                 {errors.email && (
                   <p className="text-red-500 text-xs mt-1">
                     {errors.email.message}
