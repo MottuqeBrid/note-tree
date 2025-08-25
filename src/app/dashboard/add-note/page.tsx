@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import { uploadFile } from "../../../../lib/uploadFile";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type FormData = {
   title: string;
@@ -37,6 +38,8 @@ export default function AddNote() {
   const [linkFields, setLinkFields] = useState([{ name: "", url: "" }]);
   const [fileFields, setFileFields] = useState([{ name: "", file: null }]);
   const [tagInput, setTagInput] = useState("");
+
+  const router = useRouter();
 
   const addLinkField = () => {
     setLinkFields([...linkFields, { name: "", url: "" }]);
@@ -157,6 +160,7 @@ export default function AddNote() {
         setLinkFields([{ name: "", url: "" }]);
         setFileFields([{ name: "", file: null }]);
         setTagInput("");
+        router.push("/dashboard/all-notes");
       } else {
         Swal.fire("Error", resData.error || "Something went wrong", "error");
       }
@@ -285,7 +289,12 @@ export default function AddNote() {
 
         {/* Files */}
         <div>
-          <label className="block font-medium">Files</label>
+          <label className="block font-medium">
+            <span>Files</span>
+            <span className="block mt-0 opacity-35">
+              <small>add multiple files. PDF and images are recommended</small>
+            </span>
+          </label>
           {fileFields.map((f, idx) => (
             <div key={idx} className="flex gap-2 mb-2">
               <input

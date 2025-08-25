@@ -152,7 +152,7 @@ export default function Page() {
                       <a
                         key={file._id}
                         href={file.url}
-                        // target="_blank"
+                        target="_blank"
                         download={file.name}
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 text-green-600 hover:underline"

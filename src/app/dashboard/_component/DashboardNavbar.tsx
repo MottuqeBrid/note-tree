@@ -17,7 +17,7 @@ export default function DashboardNavbar() {
   const getUser = async () => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/profile`, {
       method: "GET",
-      credentials: "include", // very important
+      credentials: "include",
       cache: "no-store",
     });
     const data = await res.json();
