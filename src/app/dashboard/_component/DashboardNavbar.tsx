@@ -1,7 +1,7 @@
 "use client";
 import Logo from "@/sharedComponent/Logo";
 import ThemeToggle from "@/sharedComponent/ThemToggle";
-import Image from "next/image";
+
 import Link from "next/link";
 import { useEffect, useState } from "react";
 type User = {

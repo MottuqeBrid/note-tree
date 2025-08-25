@@ -8,6 +8,8 @@ const navLinks = (
       <Link href="/" className="">
         Home
       </Link>
+    </li>
+    <li>
       <Link href="/terms" className="">
         Terms and Conditions
       </Link>
@@ -53,10 +55,10 @@ export default function AuthNavbar() {
         <div className="navbar-end">
           <div className="flex gap-2">
             <ThemeToggle />
-            <Link href="/login" className="btn btn-primary">
+            <Link href="/login" className="btn btn-primary text-neutral">
               Login
             </Link>
-            <Link href="/register" className="btn btn-secondary">
+            <Link href="/register" className="btn btn-secondary text-neutral">
               Register
             </Link>
           </div>
