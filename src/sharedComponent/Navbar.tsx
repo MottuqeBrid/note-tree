@@ -36,7 +36,7 @@ export default function Navbar() {
 
   const authLink = user ? (
     <>
-      <div className="btn btn-ghost btn-circle avatar">
+      <div className="btn btn-ghost btn-circle avatar ">
         <div className="w-10 rounded-full">
           <Image
             src={
@@ -74,13 +74,18 @@ export default function Navbar() {
               Dashboard
             </Link>
           </li>
+          <li>
+            <Link href="/cover" className="">
+              Cover Page
+            </Link>
+          </li>
         </>
       )}
     </>
   );
 
   return (
-    <div className="shadow-sm w-full sticky top-0 z-50 bg-base-100/70">
+    <div className="shadow-sm w-full sticky top-0 z-50 bg-base-100/40  bg-opacity-50 backdrop-filter backdrop-blur-lg">
       <nav className="navbar max-w-7xl mx-auto">
         <div className="navbar-start">
           <div className="dropdown">

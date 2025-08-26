@@ -1,7 +1,15 @@
-export default function UpdateProfilePage() {
+import EditUserForm from "./EditUserForm";
+
+export default async function UpdateProfilePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
   return (
     <div>
-      <h1>Update Profile</h1>
+      <EditUserForm id={id} />
     </div>
   );
 }
