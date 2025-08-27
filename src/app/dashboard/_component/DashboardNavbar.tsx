@@ -3,7 +3,9 @@ import Logo from "@/sharedComponent/Logo";
 import ThemeToggle from "@/sharedComponent/ThemToggle";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 type User = {
   email?: string;
   name?: string;
@@ -13,7 +15,7 @@ type User = {
 };
 export default function DashboardNavbar() {
   const [user, setUser] = useState<User | null>(null);
-
+  const router = useRouter();
   const getUser = async () => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/profile`, {
       method: "GET",
@@ -26,6 +28,7 @@ export default function DashboardNavbar() {
       setUser(data?.user);
     } else {
       setUser(null);
+      router.push("/login");
     }
   };
   useEffect(() => {
@@ -92,6 +95,26 @@ export default function DashboardNavbar() {
       </li>
     </>
   );
+
+  const handleLogout = async () => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      // Handle successful logout
+      router.push("/login");
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Logout Failed",
+        text: data.message || data.error || "Something went wrong",
+      });
+    }
+  };
+
   return (
     <div className="shadow-sm w-full sticky top-0 z-50 bg-base-100/70">
       <div className="navbar bg-base-100 shadow-sm">
@@ -168,7 +191,12 @@ export default function DashboardNavbar() {
             </div>
           </button> */}
           <ThemeToggle />
-          <button className="btn btn-primary text-neutral">Log Out</button>
+          <button
+            onClick={handleLogout}
+            className="btn btn-primary text-neutral"
+          >
+            Log Out
+          </button>
         </div>
       </div>
     </div>

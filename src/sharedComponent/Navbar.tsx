@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 type User = {
   email?: string;
   name?: string;
+  role?: string;
   photo?: {
     profile?: string;
   };
@@ -75,10 +76,23 @@ export default function Navbar() {
             </Link>
           </li>
           <li>
+            <Link href="/group-note" className="">
+              Group Note
+            </Link>
+          </li>
+          <li>
             <Link href="/cover" className="">
               Cover Page
             </Link>
           </li>
+
+          {user?.role === "admin" && (
+            <li>
+              <Link href="/admin" className="">
+                Admin
+              </Link>
+            </li>
+          )}
         </>
       )}
     </>
