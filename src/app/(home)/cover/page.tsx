@@ -9,16 +9,20 @@ import {
   FaIdCard,
   FaCalendarAlt,
   FaPrint,
-  FaPalette,
   FaCopy,
   FaLayerGroup,
   FaGraduationCap,
 } from "react-icons/fa";
-import { CoverDesign1, CoverDesign2 } from "./CoverDesigns";
+import {
+  CoverDesign1,
+  CoverDesign2,
+  CoverDesign3,
+  CoverDesign4,
+} from "./CoverDesigns";
+import { Cover2Blue, Cover2Green, Cover2Purple, Cover2Red } from "./Cover2";
+import html2canvas from "html2canvas-pro";
+import jsPDF from "jspdf";
 
-type Theme = "classic" | "modern" | "minimal" | "bordered";
-
-// Matches provided schema
 interface CoverData {
   title: string;
   courseTitle: string;
@@ -27,12 +31,12 @@ interface CoverData {
   studentName: string;
   studentId: string;
   year: string;
-  term: string; // term/semester
+  term: string;
   teacherName: string;
   studentDiscipline: string;
   teacherDiscipline: string;
   degree: string;
-  date: string; // ISO string for simplicity
+  date: string;
   studentInstitute: string;
   teacherInstitute: string;
   coverType: string;
@@ -60,23 +64,24 @@ const demoCover: CoverData = {
 };
 
 export default function CoverPage() {
-  const [theme, setTheme] = useState<Theme>("classic");
   const [data, setData] = useState<CoverData>(demoCover);
   const [copied, setCopied] = useState(false);
-  const [design, setDesign] = useState<"standard" | "design1" | "design2">(
-    "standard"
-  );
+  const [design, setDesign] = useState<
+    | "design1"
+    | "design2"
+    | "design3"
+    | "design4"
+    | "cover2-blue"
+    | "cover2-green"
+    | "cover2-purple"
+    | "cover2-red"
+  >("design1");
   const designRef = useRef<HTMLDivElement | null>(null);
 
-  // Sync Category with theme (Category means theme per user request)
+  // Sync Category with chosen design
   useEffect(() => {
-    // If using standard theme-driven design, sync Category with theme; otherwise with design key
-    if (design === "standard") {
-      setData((d) => ({ ...d, Category: theme }));
-    } else {
-      setData((d) => ({ ...d, Category: design }));
-    }
-  }, [theme, design]);
+    setData((d) => ({ ...d, Category: design }));
+  }, [design]);
 
   const updateField = (key: keyof CoverData, value: string) => {
     setData((d) => ({ ...d, [key]: value }));
@@ -86,22 +91,7 @@ export default function CoverPage() {
     setData(demoCover);
   };
 
-  const themeClasses: Record<Theme, string> = {
-    classic:
-      "bg-white text-gray-700 [&_.heading]:font-serif [&_.uni]:tracking-wide",
-    modern:
-      "bg-gradient-to-br from-indigo-50 via-white to-pink-50 text-slate-700 [&_.heading]:font-semibold",
-    minimal: "bg-white text-gray-800 [&_.heading]:font-light",
-    bordered:
-      "bg-white text-gray-700 border-4 border-gray-800 [&_.heading]:font-serif",
-  };
-
-  const accentColors: Record<Theme, string> = {
-    classic: "text-blue-700",
-    modern: "text-indigo-600",
-    minimal: "text-gray-900",
-    bordered: "text-gray-900",
-  };
+  // Removed theme variations with standard design; only alternate fixed designs remain.
 
   const copyPlainText = () => {
     const plain = `COVER PAGE (${data.coverType.toUpperCase()})\nCategory: ${
@@ -123,6 +113,54 @@ export default function CoverPage() {
     });
   };
   const printable = useMemo(() => ({ ...data }), [data]);
+
+  const handleDownloadPDF = async () => {
+    // Capture only the active preview (designRef points to inner design base of selected design)
+    const base = designRef.current;
+    if (!base) return;
+    // If wrapped in responsive-inner, prefer that for full layout
+    const wrapper = base
+      .closest(".print-area")
+      ?.querySelector(".responsive-inner") as HTMLElement | null;
+    const target = wrapper || base;
+
+    const prevTransform = target.style.transform;
+    target.style.transform = "scale(1)";
+
+    const canvas = await html2canvas(target, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+      logging: false,
+    });
+
+    target.style.transform = prevTransform;
+
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+    const pageWidth = 210;
+    const pageHeight = 297;
+    const imgAspect = canvas.width / canvas.height;
+    let renderWidth = pageWidth;
+    let renderHeight = renderWidth / imgAspect;
+    if (renderHeight > pageHeight) {
+      renderHeight = pageHeight;
+      renderWidth = renderHeight * imgAspect;
+    }
+    const x = (pageWidth - renderWidth) / 2;
+    const y = (pageHeight - renderHeight) / 2;
+    pdf.addImage(
+      imgData,
+      "PNG",
+      x,
+      y,
+      renderWidth,
+      renderHeight,
+      undefined,
+      "FAST"
+    );
+    pdf.save(`${data.title || "cover-page"}.pdf`);
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-10">
@@ -153,10 +191,20 @@ export default function CoverPage() {
             select a theme, then print or copy.
           </p>
           <div className="flex flex-wrap gap-5 items-center">
-            {/* Design Selector */}
-            <div className="flex items-center gap-2 text-sm">
+            <div className="flex items-center gap-2 text-sm flex-wrap">
               <span className="text-gray-600 font-medium">Design:</span>
-              {(["standard", "design1", "design2"] as const).map((d) => (
+              {(
+                [
+                  "design1",
+                  "design2",
+                  "design3",
+                  "design4",
+                  "cover2-blue",
+                  "cover2-green",
+                  "cover2-purple",
+                  "cover2-red",
+                ] as const
+              ).map((d) => (
                 <button
                   key={d}
                   onClick={() => setDesign(d)}
@@ -166,7 +214,71 @@ export default function CoverPage() {
                       : "bg-base-100 border-base-300 hover:border-primary/40"
                   }`}
                 >
-                  {d}
+                  {d.startsWith("cover2")
+                    ? d.replace("cover2-", "Cover2 ")
+                    : d.replace("design", "Design ")}
+                </button>
+              ))}
+            </div>
+            {/* Visual Thumbnails for Designs */}
+            <div className="flex items-start gap-4 no-print overflow-x-auto pb-2">
+              {[
+                {
+                  key: "design1" as const,
+                  label: "Design 1",
+                  Comp: CoverDesign1,
+                },
+                {
+                  key: "design2" as const,
+                  label: "Design 2",
+                  Comp: CoverDesign2,
+                },
+                {
+                  key: "design3" as const,
+                  label: "Design 3",
+                  Comp: CoverDesign3,
+                },
+                {
+                  key: "design4" as const,
+                  label: "Design 4",
+                  Comp: CoverDesign4,
+                },
+                {
+                  key: "cover2-blue" as const,
+                  label: "Cover2 Blue",
+                  Comp: Cover2Blue,
+                },
+                {
+                  key: "cover2-green" as const,
+                  label: "Cover2 Green",
+                  Comp: Cover2Green,
+                },
+                {
+                  key: "cover2-purple" as const,
+                  label: "Cover2 Purple",
+                  Comp: Cover2Purple,
+                },
+                {
+                  key: "cover2-red" as const,
+                  label: "Cover2 Red",
+                  Comp: Cover2Red,
+                },
+              ].map(({ key, label, Comp }) => (
+                <button
+                  key={key}
+                  onClick={() => setDesign(key)}
+                  className={`relative group shrink-0 border rounded-md p-1 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-base-100 ${
+                    design === key
+                      ? "ring-2 ring-primary border-primary"
+                      : "border-base-300 hover:border-primary/50"
+                  }`}
+                >
+                  <div className="w-24 overflow-hidden rounded-sm">
+                    <Comp formData={printable} />
+                  </div>
+                  <span className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/60 text-white text-[9px] px-1 py-[1px] rounded opacity-0 group-hover:opacity-100 transition pointer-events-none whitespace-nowrap">
+                    {label}
+                  </span>
                 </button>
               ))}
             </div>
@@ -187,26 +299,7 @@ export default function CoverPage() {
                 </button>
               ))}
             </div>
-            {design === "standard" && (
-              <div className="flex items-center gap-2 text-sm">
-                <FaPalette className="text-primary" /> Theme:
-                {(["classic", "modern", "minimal", "bordered"] as Theme[]).map(
-                  (c) => (
-                    <button
-                      key={c}
-                      onClick={() => setTheme(c)}
-                      className={`px-3 py-1 rounded-full text-xs capitalize border transition ${
-                        theme === c
-                          ? "bg-primary text-white border-primary"
-                          : "bg-base-100 border-base-300 hover:border-primary/40"
-                      }`}
-                    >
-                      {c}
-                    </button>
-                  )
-                )}
-              </div>
-            )}
+            {/* Theme selector removed */}
           </div>
         </div>
         <div className="flex gap-3 no-print">
@@ -217,7 +310,8 @@ export default function CoverPage() {
             <FaCopy /> {copied ? "Copied" : "Copy Text"}
           </button>
           <button
-            onClick={() => window.print()}
+            // window.print()
+            onClick={() => handleDownloadPDF()}
             className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white text-sm font-medium shadow hover:shadow-md"
           >
             <FaPrint /> Print
@@ -265,12 +359,17 @@ export default function CoverPage() {
               />
             </Field>
             <Field label="Section" icon={<FaLayerGroup />}>
-              <input
-                className="input input-bordered w-full"
+              <select
+                className="select select-bordered w-full"
                 value={data.section}
                 onChange={(e) => updateField("section", e.target.value)}
-                placeholder="Section A"
-              />
+              >
+                {["A", "B", "Both"].map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
             </Field>
             <Field label="Student Name" icon={<FaUserGraduate />}>
               <input
@@ -384,76 +483,9 @@ export default function CoverPage() {
 
         {/* Preview */}
         <AnimatePresence mode="wait">
-          {design === "standard" ? (
+          {design === "design1" && (
             <motion.div
-              key={"standard-" + theme + data.coverType}
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
-              className={`print-area relative rounded-2xl p-10 shadow-xl ring-1 ring-black/5 min-h-[900px] flex flex-col justify-between ${themeClasses[theme]}`}
-            >
-              <div className="space-y-8">
-                <div className="text-center space-y-3">
-                  <h2
-                    className={`uni text-xl md:text-2xl font-semibold ${accentColors[theme]}`}
-                  >
-                    {printable.studentInstitute}
-                  </h2>
-                  <p className="text-sm md:text-base font-medium tracking-wide">
-                    {printable.studentDiscipline}
-                  </p>
-                  <div className="h-px bg-gradient-to-r from-transparent via-gray-400/40 to-transparent w-2/3 mx-auto" />
-                  <p className="text-xs uppercase tracking-[0.3em] text-gray-500">
-                    {printable.coverType} Cover Page • {theme} theme
-                  </p>
-                </div>
-                <div className="mt-10 space-y-6">
-                  <section className="space-y-2 text-center">
-                    <h1
-                      className={`heading text-2xl md:text-3xl font-bold leading-snug ${accentColors[theme]}`}
-                    >
-                      {printable.title}
-                    </h1>
-                  </section>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-sm leading-relaxed">
-                    <div className="space-y-2">
-                      <Info label="Course Code" value={printable.courseCode} />
-                      <Info
-                        label="Course Title"
-                        value={printable.courseTitle}
-                      />
-                      <Info label="Section" value={printable.section} />
-                    </div>
-                    <div className="space-y-2">
-                      <Info label="Student" value={printable.studentName} />
-                      <Info label="Student ID" value={printable.studentId} />
-                      <Info label="Degree" value={printable.degree} />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-sm mt-4">
-                    <Info label="Teacher" value={printable.teacherName} />
-                    <Info
-                      label="Teacher Discipline"
-                      value={printable.teacherDiscipline}
-                    />
-                    <Info
-                      label="Teacher Institute"
-                      value={printable.teacherInstitute}
-                    />
-                    <Info label="Year" value={printable.year} />
-                    <Info label="Term" value={printable.term} />
-                    <Info label="Date" value={printable.date} />
-                  </div>
-                </div>
-              </div>
-              <footer className="pt-12 text-center text-[11px] text-gray-500">
-                Generated with Cover Page Builder (Schema Demo)
-              </footer>
-            </motion.div>
-          ) : design === "design1" ? (
-            <motion.div
-              key={"design1"}
+              key="design1"
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -462,9 +494,10 @@ export default function CoverPage() {
             >
               <CoverDesign1 ref={designRef} formData={printable} />
             </motion.div>
-          ) : (
+          )}
+          {design === "design2" && (
             <motion.div
-              key={"design2"}
+              key="design2"
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -472,6 +505,78 @@ export default function CoverPage() {
               className="print-area mx-auto"
             >
               <CoverDesign2 ref={designRef} formData={printable} />
+            </motion.div>
+          )}
+          {design === "design3" && (
+            <motion.div
+              key="design3"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="print-area mx-auto"
+            >
+              <CoverDesign3 ref={designRef} formData={printable} />
+            </motion.div>
+          )}
+          {design === "design4" && (
+            <motion.div
+              key="design4"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="print-area mx-auto"
+            >
+              <CoverDesign4 ref={designRef} formData={printable} />
+            </motion.div>
+          )}
+          {design === "cover2-blue" && (
+            <motion.div
+              key="cover2-blue"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="print-area mx-auto"
+            >
+              <Cover2Blue ref={designRef} formData={printable} />
+            </motion.div>
+          )}
+          {design === "cover2-green" && (
+            <motion.div
+              key="cover2-green"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="print-area mx-auto"
+            >
+              <Cover2Green ref={designRef} formData={printable} />
+            </motion.div>
+          )}
+          {design === "cover2-purple" && (
+            <motion.div
+              key="cover2-purple"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="print-area mx-auto"
+            >
+              <Cover2Purple ref={designRef} formData={printable} />
+            </motion.div>
+          )}
+          {design === "cover2-red" && (
+            <motion.div
+              key="cover2-red"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="print-area mx-auto"
+            >
+              <Cover2Red ref={designRef} formData={printable} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -500,15 +605,4 @@ function Field({
   );
 }
 
-function Info({ label, value }: { label: string; value: string }) {
-  return (
-    <p className="flex gap-2">
-      <span className="font-semibold text-gray-500 w-32 shrink-0">
-        {label}:
-      </span>
-      <span className="font-medium text-gray-700 break-words">
-        {value || "-"}
-      </span>
-    </p>
-  );
-}
+// Removed Info component (was used only in standard design)
