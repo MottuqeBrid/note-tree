@@ -85,6 +85,11 @@ export default function DashboardNavbar() {
           Add Note
         </Link>
       </li>
+      <li>
+        <Link href="/dashboard/image" className="">
+          Image
+        </Link>
+      </li>
     </>
   );
   return (

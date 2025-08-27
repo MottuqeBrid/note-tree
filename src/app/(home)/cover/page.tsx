@@ -30,6 +30,7 @@ import { CoverDesign11 } from "./Cover11";
 import { CoverDesign12 } from "./Cover12";
 import html2canvas from "html2canvas-pro";
 import jsPDF from "jspdf";
+import { toast, ToastContainer } from "react-toastify";
 
 interface CoverData {
   title: string;
@@ -54,12 +55,12 @@ interface CoverData {
 const demoCover: CoverData = {
   title: "Assignment 02: Graph Traversal Analysis",
   courseTitle: "Data Structures & Algorithms",
-  section: "Section A",
-  courseCode: "CSE 3101",
+  section: "B",
+  courseCode: "0542 3101 CSE",
   studentName: "John Doe",
-  studentId: "CSE-210324",
-  year: "2025",
-  term: "Fall",
+  studentId: "210324",
+  year: "3rd Year",
+  term: "1st Term",
   teacherName: "Dr. Amelia Howard",
   studentDiscipline: "Computer Science & Engineering",
   teacherDiscipline: "Algorithms & Complexity",
@@ -68,7 +69,7 @@ const demoCover: CoverData = {
   studentInstitute: "Global Tech University",
   teacherInstitute: "Global Tech University",
   coverType: "assignment",
-  Category: "Academic",
+  Category: "design4",
 };
 
 export default function CoverPage() {
@@ -91,7 +92,7 @@ export default function CoverPage() {
     | "design10"
     | "design11"
     | "design12"
-  >("design1");
+  >("design12");
   const designRef = useRef<HTMLDivElement | null>(null);
 
   // Sync Category with chosen design
@@ -103,10 +104,28 @@ export default function CoverPage() {
     setData((d) => ({ ...d, [key]: value }));
   };
 
-  const resetDemo = () => {
-    setData(demoCover);
+  const resetDemo = async () => {
+    await loadDemoData();
   };
-
+  const loadDemoData = async () => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/covers/demo`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    const data = await res.json();
+    if (data.success) {
+      setData(data?.cover);
+      setDesign(data?.cover?.Category);
+    } else {
+      setData(demoCover);
+    }
+  };
+  useEffect(() => {
+    loadDemoData();
+  }, []);
   // Removed theme variations with standard design; only alternate fixed designs remain.
 
   const copyPlainText = () => {
@@ -134,52 +153,75 @@ export default function CoverPage() {
     // Capture only the active preview (designRef points to inner design base of selected design)
     const base = designRef.current;
     if (!base) return;
-    // If wrapped in responsive-inner, prefer that for full layout
-    const wrapper = base
-      .closest(".print-area")
-      ?.querySelector(".responsive-inner") as HTMLElement | null;
-    const target = wrapper || base;
 
-    const prevTransform = target.style.transform;
-    target.style.transform = "scale(1)";
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/covers/create`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(data),
+        }
+      );
+      const resData = await res.json();
+      if (resData.success) {
+        toast.success("Cover page created.");
+      } else {
+        toast.error("Failed to create cover page.");
+      }
+    } catch (error) {
+      toast.error("Failed to create cover page.");
+      console.log(error);
+    } finally {
+      const wrapper = base
+        .closest(".print-area")
+        ?.querySelector(".responsive-inner") as HTMLElement | null;
+      const target = wrapper || base;
 
-    const canvas = await html2canvas(target, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: "#ffffff",
-      logging: false,
-    });
+      const prevTransform = target.style.transform;
+      target.style.transform = "scale(1)";
 
-    target.style.transform = prevTransform;
+      const canvas = await html2canvas(target, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+      });
 
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("p", "mm", "a4");
-    const pageWidth = 210;
-    const pageHeight = 297;
-    const imgAspect = canvas.width / canvas.height;
-    let renderWidth = pageWidth;
-    let renderHeight = renderWidth / imgAspect;
-    if (renderHeight > pageHeight) {
-      renderHeight = pageHeight;
-      renderWidth = renderHeight * imgAspect;
+      target.style.transform = prevTransform;
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const imgAspect = canvas.width / canvas.height;
+      let renderWidth = pageWidth;
+      let renderHeight = renderWidth / imgAspect;
+      if (renderHeight > pageHeight) {
+        renderHeight = pageHeight;
+        renderWidth = renderHeight * imgAspect;
+      }
+      const x = (pageWidth - renderWidth) / 2;
+      const y = (pageHeight - renderHeight) / 2;
+      pdf.addImage(
+        imgData,
+        "PNG",
+        x,
+        y,
+        renderWidth,
+        renderHeight,
+        undefined,
+        "FAST"
+      );
+      pdf.save(`${data.title || "cover-page"}.pdf`);
     }
-    const x = (pageWidth - renderWidth) / 2;
-    const y = (pageHeight - renderHeight) / 2;
-    pdf.addImage(
-      imgData,
-      "PNG",
-      x,
-      y,
-      renderWidth,
-      renderHeight,
-      undefined,
-      "FAST"
-    );
-    pdf.save(`${data.title || "cover-page"}.pdf`);
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-10">
+    <div className="p-6 space-y-10">
       <style>{`/* Standard themed design print visibility */
 @media print { body * { visibility:hidden !important; } .print-area, .print-area * { visibility:visible !important; } .no-print { display:none !important; } .print-area { position:absolute; inset:0; margin:0; width:100%; height:auto; box-shadow:none !important; } }
 /* Full-bleed page for alternate fixed designs */
@@ -200,8 +242,9 @@ export default function CoverPage() {
 .cover-theme-lock,[data-theme="light"].cover-theme-lock{color-scheme:light;}
 .cover-theme-lock *{--tw-prose-invert:initial;}
 `}</style>
-      <header className="flex flex-col lg:flex-row lg:items-end gap-6">
-        <div className="flex-1 space-y-4">
+      <ToastContainer />
+      <div className="flex flex-col  gap-6">
+        <div className="w-full space-y-4">
           <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
             <FaUniversity className="text-primary" /> Cover Page Builder
           </h1>
@@ -372,27 +415,27 @@ export default function CoverPage() {
         <div className="flex gap-3 no-print">
           <button
             onClick={copyPlainText}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-base-200 hover:bg-base-300 text-sm font-medium"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-base-200 hover:bg-base-300 text-sm font-medium cursor-copy"
           >
             <FaCopy /> {copied ? "Copied" : "Copy Text"}
           </button>
           <button
             // window.print()
             onClick={() => handleDownloadPDF()}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white text-sm font-medium shadow hover:shadow-md"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white text-sm font-medium shadow hover:shadow-md cursor-pointer"
           >
             <FaPrint /> Print
           </button>
           <button
             onClick={resetDemo}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-base-300 text-sm font-medium hover:bg-base-200"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-base-300 text-sm font-medium hover:bg-base-200 cursor-pointer"
           >
             Reset
           </button>
         </div>
-      </header>
+      </div>
 
-      <div className="grid lg:grid-cols-2 gap-10 items-start">
+      <div className="grid grid-cols-1 gap-10 items-start">
         {/* Form */}
         <motion.form
           onSubmit={(e) => e.preventDefault()}
