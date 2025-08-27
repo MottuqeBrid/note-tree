@@ -20,6 +20,14 @@ import {
   CoverDesign4,
 } from "./CoverDesigns";
 import { Cover2Blue, Cover2Green, Cover2Purple, Cover2Red } from "./Cover2";
+import { CoverDesign5 } from "./Cover5";
+import { CoverDesign6 } from "./Cover6";
+import { CoverDesign7 } from "./Cover7";
+import { CoverDesign8 } from "./Cover8";
+import { CoverDesign9 } from "./Cover9";
+import { CoverDesign10 } from "./Cover10";
+import { CoverDesign11 } from "./Cover11";
+import { CoverDesign12 } from "./Cover12";
 import html2canvas from "html2canvas-pro";
 import jsPDF from "jspdf";
 
@@ -75,6 +83,14 @@ export default function CoverPage() {
     | "cover2-green"
     | "cover2-purple"
     | "cover2-red"
+    | "design5"
+    | "design6"
+    | "design7"
+    | "design8"
+    | "design9"
+    | "design10"
+    | "design11"
+    | "design12"
   >("design1");
   const designRef = useRef<HTMLDivElement | null>(null);
 
@@ -180,6 +196,9 @@ export default function CoverPage() {
   .print-design ~ * { display:none !important; }
   .print-design, .print-design * { page-break-before:avoid; page-break-after:avoid; page-break-inside:avoid; }
 }
+/* Lock cover preview area to light palette so global theme doesn't alter fixed design colors */
+.cover-theme-lock,[data-theme="light"].cover-theme-lock{color-scheme:light;}
+.cover-theme-lock *{--tw-prose-invert:initial;}
 `}</style>
       <header className="flex flex-col lg:flex-row lg:items-end gap-6">
         <div className="flex-1 space-y-4">
@@ -203,6 +222,14 @@ export default function CoverPage() {
                   "cover2-green",
                   "cover2-purple",
                   "cover2-red",
+                  "design5",
+                  "design6",
+                  "design7",
+                  "design8",
+                  "design9",
+                  "design10",
+                  "design11",
+                  "design12",
                 ] as const
               ).map((d) => (
                 <button
@@ -221,7 +248,7 @@ export default function CoverPage() {
               ))}
             </div>
             {/* Visual Thumbnails for Designs */}
-            <div className="flex items-start gap-4 no-print overflow-x-auto pb-2">
+            <div className="flex items-start gap-1 flex-wrap no-print overflow-x-auto pb-2">
               {[
                 {
                   key: "design1" as const,
@@ -262,6 +289,46 @@ export default function CoverPage() {
                   key: "cover2-red" as const,
                   label: "Cover2 Red",
                   Comp: Cover2Red,
+                },
+                {
+                  key: "design5" as const,
+                  label: "Design 5",
+                  Comp: CoverDesign5,
+                },
+                {
+                  key: "design6" as const,
+                  label: "Design 6",
+                  Comp: CoverDesign6,
+                },
+                {
+                  key: "design7" as const,
+                  label: "Design 7",
+                  Comp: CoverDesign7,
+                },
+                {
+                  key: "design8" as const,
+                  label: "Design 8",
+                  Comp: CoverDesign8,
+                },
+                {
+                  key: "design9" as const,
+                  label: "Design 9",
+                  Comp: CoverDesign9,
+                },
+                {
+                  key: "design10" as const,
+                  label: "Design 10",
+                  Comp: CoverDesign10,
+                },
+                {
+                  key: "design11" as const,
+                  label: "Design 11",
+                  Comp: CoverDesign11,
+                },
+                {
+                  key: "design12" as const,
+                  label: "Design 12",
+                  Comp: CoverDesign12,
                 },
               ].map(({ key, label, Comp }) => (
                 <button
@@ -490,7 +557,7 @@ export default function CoverPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className="print-area mx-auto"
+              className="print-area mx-auto cover-theme-lock"
             >
               <CoverDesign1 ref={designRef} formData={printable} />
             </motion.div>
@@ -502,7 +569,8 @@ export default function CoverPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className="print-area mx-auto"
+              className="print-area mx-auto cover-theme-lock"
+              data-theme="light"
             >
               <CoverDesign2 ref={designRef} formData={printable} />
             </motion.div>
@@ -514,7 +582,8 @@ export default function CoverPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className="print-area mx-auto"
+              className="print-area mx-auto cover-theme-lock"
+              data-theme="light"
             >
               <CoverDesign3 ref={designRef} formData={printable} />
             </motion.div>
@@ -526,7 +595,8 @@ export default function CoverPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className="print-area mx-auto"
+              className="print-area mx-auto cover-theme-lock"
+              data-theme="light"
             >
               <CoverDesign4 ref={designRef} formData={printable} />
             </motion.div>
@@ -538,7 +608,8 @@ export default function CoverPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className="print-area mx-auto"
+              className="print-area mx-auto cover-theme-lock"
+              data-theme="light"
             >
               <Cover2Blue ref={designRef} formData={printable} />
             </motion.div>
@@ -550,7 +621,8 @@ export default function CoverPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className="print-area mx-auto"
+              className="print-area mx-auto cover-theme-lock"
+              data-theme="light"
             >
               <Cover2Green ref={designRef} formData={printable} />
             </motion.div>
@@ -562,7 +634,8 @@ export default function CoverPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className="print-area mx-auto"
+              className="print-area mx-auto cover-theme-lock"
+              data-theme="light"
             >
               <Cover2Purple ref={designRef} formData={printable} />
             </motion.div>
@@ -574,9 +647,114 @@ export default function CoverPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className="print-area mx-auto"
+              className="print-area mx-auto cover-theme-lock"
+              data-theme="light"
             >
               <Cover2Red ref={designRef} formData={printable} />
+            </motion.div>
+          )}
+          {design === "design5" && (
+            <motion.div
+              key="design5"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="print-area mx-auto cover-theme-lock"
+              data-theme="light"
+            >
+              <CoverDesign5 ref={designRef} formData={printable} />
+            </motion.div>
+          )}
+          {design === "design6" && (
+            <motion.div
+              key="design6"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="print-area mx-auto cover-theme-lock"
+              data-theme="light"
+            >
+              <CoverDesign6 ref={designRef} formData={printable} />
+            </motion.div>
+          )}
+          {design === "design7" && (
+            <motion.div
+              key="design7"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="print-area mx-auto cover-theme-lock"
+              data-theme="light"
+            >
+              <CoverDesign7 ref={designRef} formData={printable} />
+            </motion.div>
+          )}
+          {design === "design8" && (
+            <motion.div
+              key="design8"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="print-area mx-auto cover-theme-lock"
+              data-theme="light"
+            >
+              <CoverDesign8 ref={designRef} formData={printable} />
+            </motion.div>
+          )}
+          {design === "design9" && (
+            <motion.div
+              key="design9"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="print-area mx-auto cover-theme-lock"
+              data-theme="light"
+            >
+              <CoverDesign9 ref={designRef} formData={printable} />
+            </motion.div>
+          )}
+          {design === "design10" && (
+            <motion.div
+              key="design10"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="print-area mx-auto cover-theme-lock"
+              data-theme="light"
+            >
+              <CoverDesign10 ref={designRef} formData={printable} />
+            </motion.div>
+          )}
+          {design === "design11" && (
+            <motion.div
+              key="design11"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="print-area mx-auto cover-theme-lock"
+              data-theme="light"
+            >
+              <CoverDesign11 ref={designRef} formData={printable} />
+            </motion.div>
+          )}
+          {design === "design12" && (
+            <motion.div
+              key="design12"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="print-area mx-auto cover-theme-lock"
+              data-theme="light"
+            >
+              <CoverDesign12 ref={designRef} formData={printable} />
             </motion.div>
           )}
         </AnimatePresence>

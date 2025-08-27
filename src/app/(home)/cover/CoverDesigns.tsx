@@ -81,6 +81,7 @@ export function ResponsiveWrapper({
   }, []);
   return (
     <div
+      data-theme="light"
       ref={wrapRef}
       className={`relative w-full max-w-[1240px] mx-auto ${className || ""}`}
     >

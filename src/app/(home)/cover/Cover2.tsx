@@ -88,6 +88,7 @@ const BaseCover2 = forwardRef<HTMLDivElement, Cover2BaseProps>(
     return (
       <ResponsiveWrapper className={className}>
         <div
+          data-theme="light"
           ref={ref}
           className="design-base bg-white relative overflow-hidden z-70 w-[1240px] h-[1740px] flex flex-col px-[96px] pt-16 pb-[72px]"
         >
