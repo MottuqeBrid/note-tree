@@ -2,8 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import { FaSync, FaSearch, FaEye } from "react-icons/fa";
-import Link from "next/link";
-import Swal from "sweetalert2";
+import UserModal from "../../_component/UserModal";
 
 type User = {
   _id: string;
@@ -22,6 +21,10 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState<number>(1);
+  const [perPage, setPerPage] = useState<number>(10);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const fetchUsers = async () => {
     try {
@@ -61,75 +64,20 @@ export default function Page() {
     );
   }, [users, search]);
 
-  const handleDelete = (id: string) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "This action cannot be undone.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "No, cancel!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Call API to delete user
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/admin/users/${id}`, {
-          method: "PATCH",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ isDeleted: true }),
-        })
-          .then((res) => {
-            if (res.ok) {
-              Swal.fire("Deleted!", "User has been deleted.", "success");
-              fetchUsers();
-            } else {
-              Swal.fire("Error!", "Failed to delete user.", "error");
-            }
-          })
-          .catch((error) => {
-            Swal.fire("Error!", error.message, "error");
-          });
-      }
-    });
-  };
+  // pagination
+  const total = filtered.length;
+  const pageCount = Math.max(1, Math.ceil(total / perPage));
+  const paginated = useMemo(() => {
+    const start = (page - 1) * perPage;
+    return filtered.slice(start, start + perPage);
+  }, [filtered, page, perPage]);
 
-  const handleBan = (id: string) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "This action cannot be undone.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, ban it!",
-      cancelButtonText: "No, cancel!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Call API to ban user
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/admin/users/${id}`, {
-          method: "PATCH",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            isbanned: !users.find((u) => u._id === id)?.isbanned,
-          }),
-        })
-          .then((res) => {
-            if (res.ok) {
-              Swal.fire("Banned!", "User has been banned.", "success");
-              fetchUsers();
-            } else {
-              Swal.fire("Error!", "Failed to ban user.", "error");
-            }
-          })
-          .catch((error) => {
-            Swal.fire("Error!", error.message, "error");
-          });
-      }
-    });
-  };
+  // reset to first page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [search, perPage]);
+
+  // Actions moved into the UserModal. Table now only contains the View button.
 
   return (
     <div className="min-h-screen bg-base-100">
@@ -157,6 +105,45 @@ export default function Page() {
             >
               <FaSync className={loading ? "animate-spin" : ""} />
             </button>
+
+            {/* Pagination controls */}
+            <div className="flex items-center gap-2 ml-4">
+              <label className="text-xs text-gray-500">Per page</label>
+              <select
+                value={perPage}
+                onChange={(e) => setPerPage(Number(e.target.value))}
+                className="select select-sm select-bordered w-20"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+              <div className="text-xs text-gray-500 pl-3">
+                {total === 0
+                  ? "0 items"
+                  : `Showing ${(page - 1) * perPage + 1} - ${Math.min(
+                      page * perPage,
+                      total
+                    )} of ${total}`}
+              </div>
+              <div className="btn-group ml-2">
+                <button
+                  className="btn btn-sm"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                >
+                  Prev
+                </button>
+                <button
+                  className="btn btn-sm"
+                  onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+                  disabled={page >= pageCount}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -185,7 +172,7 @@ export default function Page() {
                   </td>
                 </tr>
               )}
-              {!loading && filtered.length === 0 && (
+              {!loading && paginated.length === 0 && (
                 <tr>
                   <td
                     colSpan={7}
@@ -196,12 +183,20 @@ export default function Page() {
                 </tr>
               )}
               {!loading &&
-                filtered.map((u, i) => (
+                paginated.map((u, i) => (
                   <tr
                     key={u._id}
-                    className={u.isDeleted ? "opacity-60 text-red-500" : ""}
+                    className={
+                      u.isDeleted
+                        ? "bg-red-50 text-red-600 opacity-90"
+                        : u.isbanned
+                        ? "bg-yellow-50 text-yellow-700"
+                        : !u.isVerified
+                        ? "bg-gray-50 text-gray-500"
+                        : ""
+                    }
                   >
-                    <td className="text-xs">{i + 1}</td>
+                    <td className="text-xs">{(page - 1) * perPage + i + 1}</td>
                     <td className="text-sm font-medium">{u.name || "—"}</td>
                     <td className="text-sm">{u.email || "—"}</td>
                     <td className="text-sm">{u.role || "user"}</td>
@@ -213,34 +208,15 @@ export default function Page() {
                     </td>
                     <td className="text-sm">
                       <div className="flex items-center gap-2">
-                        <Link
-                          href={`/admin/users/${u._id}`}
+                        <button
+                          onClick={() => {
+                            setSelectedUser(u);
+                            setModalOpen(true);
+                          }}
                           className="btn btn-xs btn-ghost flex items-center gap-2"
                         >
                           <FaEye /> View
-                        </Link>
-                        <button
-                          disabled={u.isDeleted}
-                          onClick={() => handleDelete(u._id)}
-                          className="btn btn-xs btn-ghost flex items-center gap-2"
-                        >
-                          Delete
                         </button>
-                        {u.isbanned ? (
-                          <button
-                            onClick={() => handleBan(u._id)}
-                            className="btn btn-xs text-red-600 font-medium"
-                          >
-                            Unban
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleBan(u._id)}
-                            className="btn btn-xs btn-ghost flex items-center gap-2"
-                          >
-                            Ban
-                          </button>
-                        )}
                       </div>
                     </td>
                   </tr>
@@ -248,6 +224,12 @@ export default function Page() {
             </tbody>
           </table>
         </div>
+        <UserModal
+          user={selectedUser}
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onSaved={() => fetchUsers()}
+        />
       </div>
     </div>
   );
