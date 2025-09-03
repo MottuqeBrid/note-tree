@@ -68,13 +68,31 @@ const demoCover: CoverData = {
   date: new Date().toISOString().slice(0, 10),
   studentInstitute: "Global Tech University",
   teacherInstitute: "Global Tech University",
-  coverType: "assignment",
+  coverType: "lab test",
   Category: "design4",
 };
+
+function formatDateForInput(d?: string) {
+  if (!d) return new Date().toISOString().slice(0, 10);
+  try {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+    const dt = new Date(d);
+    if (isNaN(dt.getTime())) return "";
+    const yyyy = dt.getFullYear();
+    const mm = String(dt.getMonth() + 1).padStart(2, "0");
+    const dd = String(dt.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  } catch {
+    return "";
+  }
+}
 
 export default function CoverPage() {
   const [data, setData] = useState<CoverData>(demoCover);
   const [copied, setCopied] = useState(false);
+  const [asOrLabs, setAsOrLabs] = useState<"assignment" | "lab test">(
+    demoCover.coverType === "lab test" ? "lab test" : "assignment"
+  );
   const [design, setDesign] = useState<
     | "design1"
     | "design2"
@@ -92,7 +110,7 @@ export default function CoverPage() {
     | "design10"
     | "design11"
     | "design12"
-  >("design12");
+  >("design1");
   const designRef = useRef<HTMLDivElement | null>(null);
 
   // Sync Category with chosen design
@@ -117,8 +135,13 @@ export default function CoverPage() {
     });
     const data = await res.json();
     if (data.success) {
-      setData(data?.cover);
-      setDesign(data?.cover?.Category);
+      // ensure date is normalized for input[type=date]
+      const remote = data?.cover || {};
+      remote.date = formatDateForInput(remote?.date);
+      setData(remote);
+      console.log(remote);
+      setDesign(remote?.Category || remote?.category);
+      setAsOrLabs(remote?.coverType === "lab test" ? "lab test" : "assignment");
     } else {
       setData(demoCover);
     }
@@ -398,9 +421,12 @@ export default function CoverPage() {
               {(["assignment", "lab test"] as const).map((t) => (
                 <button
                   key={t}
-                  onClick={() => updateField("coverType", t)}
+                  onClick={() => {
+                    setAsOrLabs(t);
+                    updateField("coverType", t);
+                  }}
                   className={`px-4 py-1.5 rounded-full text-xs capitalize border transition ${
-                    data.coverType === t
+                    asOrLabs === t
                       ? "bg-primary text-white border-primary"
                       : "bg-base-100 border-base-300 hover:border-primary/40"
                   }`}
