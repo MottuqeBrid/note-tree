@@ -125,9 +125,11 @@ export default function Page() {
                   {g?.thumbnail && g?.thumbnail.length > 0 ? (
                     <div className="relative w-full h-full">
                       <Image
+                        width={80}
+                        height={80}
                         src={g.thumbnail}
-                        alt={g.name}
-                        fill
+                        alt={g?.name}
+                        priority
                         className="object-cover"
                       />
                     </div>
@@ -251,9 +253,11 @@ function CreateGroupForm({
   const [groupType, setGroupType] = useState("public");
 
   const [users, setUsers] = useState<Option[]>([]);
-  const [selectedMembers, setSelectedMembers] = useState<Option[]>(
-    (existing?.members || []).map((m) => ({ value: m, label: m }))
-  );
+  const [selectedMembers, setSelectedMembers] = useState<Option[]>(() => {
+    const list = existing?.members || [];
+    const uniq = Array.from(new Set(list));
+    return uniq.map((m) => ({ value: m, label: m }));
+  });
 
   const [saving, setSaving] = useState(false);
 
@@ -272,10 +276,10 @@ function CreateGroupForm({
           })
         );
         setUsers(opts);
-        if (existing?.members)
-          setSelectedMembers(
-            opts.filter((o) => existing.members?.includes(o.value))
-          );
+        if (existing?.members) {
+          const uniq = Array.from(new Set(existing.members));
+          setSelectedMembers(opts.filter((o) => uniq.includes(o.value)));
+        }
       } catch (e) {
         console.error(e);
       }
@@ -378,7 +382,10 @@ function CreateGroupForm({
           <div className="text-xs text-gray-500 mb-1">Preview</div>
           <div className="w-40 h-24 rounded-md overflow-hidden bg-base-200">
             {/* next/image requires host config for external images; this is a simple img fallback */}
-            <img
+            <Image
+              width={80}
+              height={80}
+              priority
               src={thumbnail}
               alt="thumbnail preview"
               className="w-full h-full object-cover"
