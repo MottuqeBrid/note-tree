@@ -2,11 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
+import Link from "next/link";
 import Image from "next/image";
+import { FaSearch } from "react-icons/fa";
 
 type Group = {
   _id: string;
   name: string;
+  thumbnail?: string;
   description?: string;
   members?: string[];
   image?: string[];
@@ -15,6 +18,8 @@ type Group = {
 
 type Post = {
   image?: string[];
+  _id?: string;
+  name?: string;
   title?: string;
   description?: string;
   createdAt?: string;
@@ -32,7 +37,7 @@ export default function Page() {
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [showPostModal, setShowPostModal] = useState(false);
   const [showMembers, setShowMembers] = useState(false);
-  const [showViewPost, setShowViewPost] = useState(false);
+  const [search, setSearch] = useState("");
 
   const fetchGroups = async () => {
     try {
@@ -63,12 +68,24 @@ export default function Page() {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold">Groups</h1>
-          <p className="text-sm text-gray-500">Manage groups and posts</p>
+          <p className="text-sm text-gray-500">
+            Manage groups and posts —{" "}
+            <span className="font-medium">{groups.length}</span> total
+          </p>
         </div>
-        <div>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="relative w-full sm:w-64">
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search groups..."
+              className="input input-sm input-bordered pl-10 w-full"
+            />
+          </div>
           <button
             className="btn btn-sm"
             onClick={() => {
@@ -76,7 +93,7 @@ export default function Page() {
               setShowPostModal(true);
             }}
           >
-            Create Post
+            Create Group
           </button>
         </div>
       </div>
@@ -90,63 +107,87 @@ export default function Page() {
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {groups.map((g) => (
-          <div key={g._id} className="border rounded-md p-4 bg-base-100">
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="font-semibold">{g.name}</h3>
-                <p className="text-xs text-gray-500 mt-1">{g.description}</p>
-                <p className="text-[11px] text-gray-400 mt-2">
-                  Members: {g.members?.length || 0}
-                </p>
-              </div>
-              <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-2">
-                  <button
-                    className="btn btn-xs"
-                    onClick={() => {
-                      setSelectedGroup(g);
-                      setShowPostModal(true);
-                    }}
-                  >
-                    Post
-                  </button>
-                  <button
-                    className="btn btn-xs btn-outline"
-                    onClick={() => {
-                      setSelectedGroup(g);
-                      setShowViewPost(true);
-                    }}
-                    disabled={!g.post}
-                  >
-                    View Post
-                  </button>
-                  <button
-                    className="btn btn-xs btn-ghost"
-                    onClick={() => {
-                      setSelectedGroup(g);
-                      setShowMembers(true);
-                    }}
-                  >
-                    Members
-                  </button>
+        {(groups || [])
+          .filter((g) => {
+            const q = search.trim().toLowerCase();
+            if (!q) return true;
+            return (
+              (g.name || "").toLowerCase().includes(q) ||
+              (g.description || "").toLowerCase().includes(q)
+            );
+          })
+          .map((g) => (
+            <div
+              key={g._id}
+              className="border rounded-md p-4 bg-base-100 hover:shadow-md transition"
+            >
+              <div className="flex gap-3">
+                <div className="w-20 h-20 rounded-md bg-base-200 overflow-hidden flex items-center justify-center">
+                  {g?.thumbnail && g?.thumbnail.length > 0 ? (
+                    <div className="relative w-full h-full">
+                      <Image
+                        src={g.thumbnail}
+                        alt={g.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-xs text-gray-500 px-2">No image</div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-sm">{g.name}</h3>
+                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                    {g.description || "—"}
+                  </p>
+                  <div className="mt-3 flex items-center justify-between">
+                    <div className="text-[11px] text-gray-400">
+                      Members:{" "}
+                      <span className="font-medium">
+                        {g.members?.length || 0}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/admin/group/${g._id}`}
+                        className="btn btn-xs"
+                      >
+                        View Group
+                      </Link>
+                      <button
+                        className="btn btn-xs btn-ghost"
+                        onClick={() => {
+                          setSelectedGroup(g);
+                          setShowMembers(true);
+                        }}
+                      >
+                        Members
+                      </button>
+                    </div>
+                  </div>
+                  {g.post?.title && (
+                    <div className="mt-3 text-[12px] text-gray-600">
+                      <div className="font-medium">Latest: {g.post.title}</div>
+                      <div className="text-[11px] text-gray-400">
+                        {g.post.createdAt
+                          ? new Date(g.post.createdAt).toLocaleDateString()
+                          : ""}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
 
-      {/* Post Modal */}
+      {/* Add Group Modal */}
       {showPostModal && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
           <div className="bg-base-100 rounded-lg w-full max-w-2xl mx-4">
             <div className="p-4 border-b flex items-center justify-between">
-              <h2 className="font-semibold">
-                {selectedGroup
-                  ? `Post for ${selectedGroup.name}`
-                  : "Create Post"}
-              </h2>
+              <h2 className="font-semibold">Create Group</h2>
               <button
                 className="btn btn-ghost btn-sm"
                 onClick={() => setShowPostModal(false)}
@@ -155,134 +196,12 @@ export default function Page() {
               </button>
             </div>
             <div className="p-4">
-              <PostForm
+              <CreateGroupForm
                 onSaved={() => {
                   setShowPostModal(false);
                   fetchGroups();
                 }}
               />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* View Post Modal (read-only) */}
-      {showViewPost && selectedGroup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-base-100 rounded-lg w-full max-w-3xl mx-4 overflow-auto max-h-[90vh]">
-            <div className="p-4 border-b flex items-center justify-between">
-              <div>
-                <h2 className="font-semibold">
-                  {selectedGroup.post?.title || "Post"}
-                </h2>
-                <div className="text-xs text-gray-500">
-                  {selectedGroup.name} •{" "}
-                  {selectedGroup.post?.createdAt
-                    ? new Date(selectedGroup.post.createdAt).toLocaleString()
-                    : ""}
-                </div>
-              </div>
-              <div>
-                <button
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => setShowViewPost(false)}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-
-            <div className="p-4 space-y-4">
-              {selectedGroup.post?.image &&
-                selectedGroup.post.image.length > 0 && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {selectedGroup.post.image.map((src, i) => (
-                      <div
-                        key={i}
-                        className="relative w-full h-32 rounded overflow-hidden"
-                      >
-                        <Image
-                          src={src}
-                          alt={`post-img-${i}`}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-              <div className="prose max-w-none">
-                <h3>Description</h3>
-                <p>{selectedGroup.post?.description || "—"}</p>
-              </div>
-
-              {selectedGroup.post?.tags &&
-                selectedGroup.post.tags.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-medium">Tags</h4>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {selectedGroup.post.tags.map((t, i) => (
-                        <span key={i} className="badge badge-outline">
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-              {selectedGroup.post?.link &&
-                selectedGroup.post.link.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-medium">Links</h4>
-                    <ul className="mt-2 list-disc list-inside">
-                      {selectedGroup.post.link.map((l, i) => (
-                        <li key={i}>
-                          <a
-                            className="link"
-                            href={l.url}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            {l.name || l.url}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-              {selectedGroup.post?.file &&
-                selectedGroup.post.file.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-medium">Files</h4>
-                    <ul className="mt-2 list-inside list-disc">
-                      {selectedGroup.post.file.map((f, i) => (
-                        <li key={i}>
-                          <a
-                            className="link"
-                            href={f.url}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            {f.name || f.url}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-              <div className="flex justify-end">
-                <button
-                  className="btn btn-sm"
-                  onClick={() => {
-                    setShowViewPost(false);
-                  }}
-                >
-                  Close
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -302,7 +221,7 @@ export default function Page() {
   );
 }
 
-function PostForm({ onSaved }: { onSaved: () => void }) {
+function CreateGroupForm({ onSaved }: { onSaved: () => void }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
