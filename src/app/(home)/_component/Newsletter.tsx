@@ -2,16 +2,40 @@
 
 import { useState } from "react";
 import { FaEnvelopeOpenText } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 export default function NewsletterSection() {
   const [email, setEmail] = useState("");
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    // TODO: Connect with backend / API (e.g., Mailchimp, custom API)
-    console.log("Subscribed with:", email);
-    setEmail("");
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/others/newsletter`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to subscribe");
+      }
+      Swal.fire({
+        icon: "success",
+        title: "Subscribed!",
+        text: "You have successfully subscribed to our newsletter.",
+      });
+
+      setEmail("");
+    } catch (error) {
+      console.error("Error subscribing:", error);
+    }
   };
 
   return (
