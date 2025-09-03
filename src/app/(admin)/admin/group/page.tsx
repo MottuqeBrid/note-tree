@@ -36,7 +36,6 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [showPostModal, setShowPostModal] = useState(false);
-  const [showMembers, setShowMembers] = useState(false);
   const [search, setSearch] = useState("");
 
   const fetchGroups = async () => {
@@ -139,7 +138,7 @@ export default function Page() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-sm">{g.name}</h3>
                   <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                    {g.description || "—"}
+                    {g.description || "No description"}
                   </p>
                   <div className="mt-3 flex items-center justify-between">
                     <div className="text-[11px] text-gray-400">
@@ -156,13 +155,13 @@ export default function Page() {
                         View Group
                       </Link>
                       <button
-                        className="btn btn-xs btn-ghost"
+                        className="btn btn-xs"
                         onClick={() => {
                           setSelectedGroup(g);
-                          setShowMembers(true);
+                          setShowPostModal(true);
                         }}
                       >
-                        Members
+                        Update
                       </button>
                     </div>
                   </div>
@@ -184,59 +183,143 @@ export default function Page() {
 
       {/* Add Group Modal */}
       {showPostModal && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
-          <div className="bg-base-100 rounded-lg w-full max-w-2xl mx-4">
-            <div className="p-4 border-b flex items-center justify-between">
-              <h2 className="font-semibold">Create Group</h2>
+        <div
+          className="fixed inset-0 z-40 flex items-start sm:items-center justify-center bg-black/40"
+          onClick={() => setShowPostModal(false)}
+        >
+          <div
+            className="bg-base-100 rounded-lg w-full max-w-2xl mx-4 mt-12 sm:mt-0 shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxHeight: "80vh", overflow: "hidden" }}
+          >
+            <div className="p-4 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+              <div>
+                <h2 className="font-semibold text-lg">
+                  {selectedGroup ? "Update Group" : "Create Group"}
+                </h2>
+                <div className="text-xs text-gray-500">
+                  Provide name, type, optional thumbnail and members.
+                </div>
+              </div>
               <button
-                className="btn btn-ghost btn-sm"
+                className="btn btn-ghost btn-sm self-start sm:self-auto"
                 onClick={() => setShowPostModal(false)}
               >
                 Close
               </button>
             </div>
-            <div className="p-4">
+
+            <div
+              className="p-4 overflow-auto"
+              style={{ maxHeight: "calc(80vh - 128px)" }}
+            >
               <CreateGroupForm
+                existing={selectedGroup}
                 onSaved={() => {
                   setShowPostModal(false);
+                  setSelectedGroup(null);
                   fetchGroups();
                 }}
               />
             </div>
+
+            <div className="p-3 border-t bg-base-200 flex justify-end gap-2">
+              <button
+                className="btn btn-sm btn-ghost"
+                onClick={() => setShowPostModal(false)}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
-      )}
-
-      {showMembers && (
-        <MembersModal
-          group={selectedGroup}
-          onClose={() => {
-            setShowMembers(false);
-            setSelectedGroup(null);
-            fetchGroups();
-          }}
-        />
       )}
     </div>
   );
 }
 
-function CreateGroupForm({ onSaved }: { onSaved: () => void }) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+function CreateGroupForm({
+  existing,
+  onSaved,
+}: {
+  existing?: Group | null;
+  onSaved: () => void;
+}) {
+  const [name, setName] = useState(existing?.name || "");
+  const [description, setDescription] = useState(existing?.description || "");
+  const [thumbnail, setThumbnail] = useState(existing?.thumbnail || "");
+  const [groupType, setGroupType] = useState("public");
+
+  const [users, setUsers] = useState<Option[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<Option[]>(
+    (existing?.members || []).map((m) => ({ value: m, label: m }))
+  );
 
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/users/admin/users`,
+          { credentials: "include", cache: "no-store" }
+        );
+        const data = await res.json();
+        const opts: Option[] = (data?.users || []).map(
+          (u: { _id: string; name?: string; email?: string }) => ({
+            value: u._id,
+            label: u.name || u.email || u._id,
+          })
+        );
+        setUsers(opts);
+        if (existing?.members)
+          setSelectedMembers(
+            opts.filter((o) => existing.members?.includes(o.value))
+          );
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSave = async () => {
     try {
       setSaving(true);
-      const payload = { name, description };
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/groups/create`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const payload: {
+        name: string;
+        description: string;
+        thumbnail?: string;
+        privacy?: string;
+        members?: string[];
+      } = {
+        name,
+        description,
+        thumbnail,
+        privacy: groupType,
+        members: selectedMembers.map((s) => s.value),
+      };
+
+      if (existing && existing._id) {
+        await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/groups/update/${existing._id}`,
+          {
+            method: "PATCH",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }
+        );
+      } else {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/groups/create`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
+
       onSaved();
     } catch (e) {
       console.error(e);
@@ -256,13 +339,15 @@ function CreateGroupForm({ onSaved }: { onSaved: () => void }) {
         className="input input-bordered w-full"
       />
 
-      <div className="">
+      <div className="mt-3">
         <label className="label">
           <span className="label-text">Group type</span>
         </label>
         <select
           name="groupType"
           id="groupType"
+          value={groupType}
+          onChange={(e) => setGroupType(e.target.value)}
           className="select select-bordered w-full"
         >
           <option value="public">Public</option>
@@ -279,107 +364,50 @@ function CreateGroupForm({ onSaved }: { onSaved: () => void }) {
         className="textarea textarea-bordered w-full"
       />
 
+      <label className="label mt-3">
+        <span className="label-text">Thumbnail URL</span>
+      </label>
+      <input
+        value={thumbnail}
+        onChange={(e) => setThumbnail(e.target.value)}
+        placeholder="https://..."
+        className="input input-bordered w-full"
+      />
+      {thumbnail ? (
+        <div className="mt-3">
+          <div className="text-xs text-gray-500 mb-1">Preview</div>
+          <div className="w-40 h-24 rounded-md overflow-hidden bg-base-200">
+            {/* next/image requires host config for external images; this is a simple img fallback */}
+            <img
+              src={thumbnail}
+              alt="thumbnail preview"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+      ) : null}
+
+      <div className="mt-3">
+        <label className="label">
+          <span className="label-text">Members</span>
+        </label>
+        <Select<Option, true>
+          isMulti
+          options={users}
+          value={selectedMembers}
+          onChange={(newValue) =>
+            setSelectedMembers(Array.isArray(newValue) ? [...newValue] : [])
+          }
+        />
+      </div>
+
       <div className="mt-4 flex justify-end gap-2">
         <button className="btn btn-sm btn-ghost" onClick={onSaved}>
           Cancel
         </button>
         <button className="btn btn-sm" onClick={handleSave} disabled={saving}>
-          {saving ? "Saving..." : "Save Post"}
+          {saving ? "Saving..." : existing ? "Update Group" : "Create Group"}
         </button>
-      </div>
-    </div>
-  );
-}
-
-function MembersModal({
-  group,
-  onClose,
-}: {
-  group: Group | null;
-  onClose: () => void;
-}) {
-  const [users, setUsers] = useState<Option[]>([]);
-  const [selected, setSelected] = useState<Option[]>([]);
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/users/admin/users`,
-          { credentials: "include", cache: "no-store" }
-        );
-        const data = await res.json();
-        const opts: Option[] = (data?.users || []).map(
-          (u: { _id: string; name?: string; email?: string }) => ({
-            value: u._id,
-            label: u.name || u.email || u._id,
-          })
-        );
-        setUsers(opts);
-        if (group?.members)
-          setSelected(
-            opts.filter((o: Option) => group.members?.includes(o.value))
-          );
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    fetchUsers();
-  }, [group]);
-
-  const handleSave = async () => {
-    if (!group) return;
-    try {
-      setSaving(true);
-      const memberIds = selected.map((s) => s.value);
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/groups/update/${group._id}`,
-        {
-          method: "PATCH",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ members: memberIds }),
-        }
-      );
-      onClose();
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-base-100 rounded-md w-full max-w-2xl p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold">Manage Members for {group?.name}</h3>
-          <button className="btn btn-ghost btn-sm" onClick={onClose}>
-            Close
-          </button>
-        </div>
-        <div>
-          <label className="label">
-            <span className="label-text">Members</span>
-          </label>
-          <Select<Option, true>
-            isMulti
-            options={users}
-            value={selected}
-            onChange={(newValue) =>
-              setSelected(Array.isArray(newValue) ? [...newValue] : [])
-            }
-          />
-        </div>
-        <div className="mt-4 flex justify-end gap-2">
-          <button className="btn btn-sm btn-ghost" onClick={onClose}>
-            Cancel
-          </button>
-          <button className="btn btn-sm" onClick={handleSave} disabled={saving}>
-            {saving ? "Saving..." : "Save"}
-          </button>
-        </div>
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
       "res.cloudinary.com",
       "i.ibb.co",
       "picsum.photos",
+      "img.freepik.com",
     ],
   },
 };
