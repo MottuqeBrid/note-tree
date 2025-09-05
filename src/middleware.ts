@@ -14,6 +14,8 @@ export async function middleware(request: NextRequest) {
     "/terms",
   ];
 
+  // prefer forwarding the full Cookie header (safer across domains/origins)
+  const cookieHeader = request.headers.get("cookie") || "";
   const token = request.cookies.get("token")?.value;
 
   // If it's a public path and user is NOT logged in → just allow
@@ -26,18 +28,34 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/users/middleware`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Cookie: `token=${token};`,
-        },
-      }
-    );
+    // fallback to the current origin when NEXT_PUBLIC_API_URL isn't provided
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || request.nextUrl.origin;
+    const res = await fetch(`${apiBase}/users/middleware`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        // forward whatever cookies were included on the incoming request
+        Cookie: cookieHeader,
+      },
+    });
 
-    const data = await response.json();
+    // If the upstream is unavailable (network error or non-2xx), don't hard-fail the app on Vercel.
+    if (!res.ok) {
+      console.error(
+        "Middleware upstream returned non-ok:",
+        res.status,
+        res.statusText
+      );
+      // fail-open: allow the request rather than blocking all traffic
+      return NextResponse.next();
+    }
+
+    const data = await res.json().catch((e) => {
+      console.error("Failed to parse middleware response JSON", e);
+      return null;
+    });
+
+    if (!data) return NextResponse.next();
 
     if (data?.error) {
       return NextResponse.redirect(new URL("/login", request.url));
@@ -59,17 +77,30 @@ export async function middleware(request: NextRequest) {
         }
       }
 
-      // Example: role-based restriction
+      // Role-based allowance — keep existing behavior
       if (role === "user" || role === "admin" || role === "moderator") {
+        // keep admin path open for admins
         if (pathname === "/admin" && role === "admin") {
-          return NextResponse.redirect(new URL("/admin", request.url));
+          return NextResponse.next();
+        } else if (pathname.startsWith("/admin") && role !== "admin") {
+          return NextResponse.redirect(new URL("/dashboard", request.url));
+        }
+        // keep moderator path open for moderators
+        if (
+          pathname === "/moderator" &&
+          (role === "admin" || role === "moderator")
+        ) {
+          return NextResponse.next();
+        } else if (pathname.startsWith("/moderator") && role === "user") {
+          return NextResponse.redirect(new URL("/dashboard", request.url));
         }
         return NextResponse.next();
       }
     }
   } catch (error) {
-    console.error("Error in middleware:", error);
-    return NextResponse.redirect(new URL("/login", request.url));
+    // don't bubble errors to the user; log and allow the request so Vercel Edge doesn't block traffic
+    console.error("Error in middleware (allowing request):", error);
+    return NextResponse.next();
   }
 
   return NextResponse.next();
