@@ -85,5 +85,13 @@ export const config = {
     "/register",
     "/cover",
     "/group-note",
+    "/group-note/:path*",
+    "/note/:path*",
+    "/settings/:path*",
+    "/admin/:path*",
+    "/deactivated",
+    "/ban",
+    "/terms",
+    "/privacy",
   ],
 };
