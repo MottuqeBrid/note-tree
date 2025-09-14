@@ -16,7 +16,28 @@ export async function middleware(request: NextRequest) {
 
   // prefer forwarding the full Cookie header (safer across domains/origins)
   const cookieHeader = request.headers.get("cookie") || "";
-  const token = request.cookies.get("token")?.value;
+  // primary attempt using NextRequest cookie helper
+  let token = request.cookies.get("token")?.value;
+  console.log("Token:", token);
+  // Fallback: parse raw Cookie header if request.cookies is empty on certain Edge runtimes
+  if (!token && cookieHeader) {
+    const m = cookieHeader.match(/(?:^|; )token=([^;]+)/);
+    if (m) token = decodeURIComponent(m[1]);
+  }
+
+  // Fallback: Authorization header (Bearer token)
+  if (!token) {
+    const auth =
+      request.headers.get("authorization") ||
+      request.headers.get("Authorization");
+    if (auth && auth.startsWith("Bearer ")) {
+      token = auth.slice(7).trim();
+    }
+  }
+
+  console.log("Middleware check:", { pathname, token, cookieHeader });
+  const allCookies = await request.cookies.getAll();
+  console.log("All cookies:", allCookies);
 
   // If it's a public path and user is NOT logged in → just allow
   if (publicPaths.includes(pathname) && !token) {
