@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Swal from "sweetalert2";
+import Cookies from "js-cookie";
 
 type FormData = {
   name: string;
@@ -41,8 +42,12 @@ export default function RegisterPage() {
         }
       );
       const resData = await res.json();
-
+      console.log(resData);
       if (resData.success) {
+        // Set token in cookies if returned from backend
+        if (resData.token) {
+          Cookies.set("auth_token", resData.token, { expires: 30, path: "/" });
+        }
         Swal.fire({
           title: "Registration Successful",
           text: `Welcome to NoteTree, ${data.name}!`,

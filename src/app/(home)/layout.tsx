@@ -1,7 +1,11 @@
 import Footer from "@/sharedComponent/Footer";
 import Navbar from "@/sharedComponent/Navbar";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <section className="w-full">
       <Navbar />

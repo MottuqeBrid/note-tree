@@ -17,11 +17,15 @@ export async function middleware(request: NextRequest) {
   // prefer forwarding the full Cookie header (safer across domains/origins)
   const cookieHeader = request.headers.get("cookie") || "";
   // primary attempt using NextRequest cookie helper
-  let token = request.cookies.get("token")?.value;
+  let token =
+    request.cookies.get("token")?.value ||
+    request.cookies.get("auth_token")?.value;
   console.log("Token:", token);
   // Fallback: parse raw Cookie header if request.cookies is empty on certain Edge runtimes
   if (!token && cookieHeader) {
-    const m = cookieHeader.match(/(?:^|; )token=([^;]+)/);
+    const m =
+      cookieHeader.match(/(?:^|; )token=([^;]+)/) ||
+      cookieHeader.match(/(?:^|; )auth_token=([^;]+)/);
     if (m) token = decodeURIComponent(m[1]);
   }
 
@@ -34,10 +38,6 @@ export async function middleware(request: NextRequest) {
       token = auth.slice(7).trim();
     }
   }
-
-  console.log("Middleware check:", { pathname, token, cookieHeader });
-  const allCookies = await request.cookies.getAll();
-  console.log("All cookies:", allCookies);
 
   // If it's a public path and user is NOT logged in → just allow
   if (publicPaths.includes(pathname) && !token) {
@@ -59,7 +59,7 @@ export async function middleware(request: NextRequest) {
         Cookie: cookieHeader,
       },
     });
-
+    console.log("Middleware response status:", await res.json());
     // If the upstream is unavailable (network error or non-2xx), don't hard-fail the app on Vercel.
     if (!res.ok) {
       console.error(

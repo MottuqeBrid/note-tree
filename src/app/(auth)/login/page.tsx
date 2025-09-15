@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Swal from "sweetalert2";
+import Cookies from "js-cookie";
 
 type FormData = {
   email: string;
@@ -36,6 +37,10 @@ export default function LoginPage() {
       const resData = await res.json();
 
       if (resData.success) {
+        // Set token in cookies if returned from backend
+        if (resData.token) {
+          Cookies.set("auth_token", resData.token, { expires: 30, path: "/" });
+        }
         Swal.fire({
           title: "Login Successful",
           text: "Welcome back to NoteTree!",
