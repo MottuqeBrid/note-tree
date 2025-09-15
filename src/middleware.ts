@@ -47,7 +47,7 @@ export async function middleware(request: NextRequest) {
   if (!publicPaths.includes(pathname) && !token) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
-
+  console.log(cookieHeader);
   try {
     // fallback to the current origin when NEXT_PUBLIC_API_URL isn't provided
     const apiBase = process.env.NEXT_PUBLIC_API_URL || request.nextUrl.origin;
@@ -56,7 +56,7 @@ export async function middleware(request: NextRequest) {
       headers: {
         "Content-Type": "application/json",
         // forward whatever cookies were included on the incoming request
-        Cookie: cookieHeader,
+        Cookie: `token=${token}; ${cookieHeader}`,
       },
     });
     console.log("Middleware response status:", await res.json());
