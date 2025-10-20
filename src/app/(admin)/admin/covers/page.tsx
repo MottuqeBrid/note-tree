@@ -46,7 +46,6 @@ export default function Page() {
       const arr = data?.covers || [];
       setCovers(Array.isArray(arr) ? arr : []);
     } catch (e) {
-      console.error(e);
     } finally {
       setLoading(false);
     }

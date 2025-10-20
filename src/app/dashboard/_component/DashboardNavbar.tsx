@@ -3,9 +3,22 @@ import Logo from "@/sharedComponent/Logo";
 import ThemeToggle from "@/sharedComponent/ThemToggle";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import {
+  FaHome,
+  FaTachometerAlt,
+  FaUser,
+  FaStickyNote,
+  FaPlus,
+  FaImage,
+  FaLock,
+  FaSignOutAlt,
+  FaBars,
+} from "react-icons/fa";
+import Image from "next/image";
+
 type User = {
   email?: string;
   name?: string;
@@ -13,9 +26,36 @@ type User = {
     profile?: string;
   };
 };
+
+type NavLinkItem = {
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+};
 export default function DashboardNavbar() {
   const [user, setUser] = useState<User | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+
+  const navigationLinks: NavLinkItem[] = [
+    { href: "/", label: "Home", icon: <FaHome /> },
+    { href: "/dashboard", label: "Dashboard", icon: <FaTachometerAlt /> },
+    { href: "/dashboard/profile", label: "Profile", icon: <FaUser /> },
+    {
+      href: "/dashboard/all-notes",
+      label: "All Notes",
+      icon: <FaStickyNote />,
+    },
+    { href: "/dashboard/add-note", label: "Add Note", icon: <FaPlus /> },
+    { href: "/dashboard/image", label: "Image", icon: <FaImage /> },
+    {
+      href: "/dashboard/update-password",
+      label: "Update Password",
+      icon: <FaLock />,
+    },
+  ];
+
   const getUser = async () => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/profile`, {
       method: "GET",
@@ -31,171 +71,205 @@ export default function DashboardNavbar() {
       router.push("/login");
     }
   };
+
   useEffect(() => {
     getUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  //   const authLink = user ? (
-  //     <>
-  //       <div className="btn btn-ghost btn-circle avatar">
-  //         <div className="w-10 rounded-full">
-  //           <Image
-  //             src={
-  //               user?.photo?.profile ||
-  //               "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-  //             }
-  //             alt={user?.name || "profile picture"}
-  //             width={32}
-  //             height={32}
-  //           />
-  //         </div>
-  //       </div>
-  //     </>
-  //   ) : (
-  //     <>
-  //       <Link href="/login" className="btn btn-primary text-neutral">
-  //         Login
-  //       </Link>
-  //       <Link href="/register" className="btn btn-secondary text-neutral">
-  //         Register
-  //       </Link>
-  //     </>
-  //   );
-  const navLinks = (
-    <>
-      <li>
-        <Link href="/" className="">
-          Home
-        </Link>
-      </li>
-      <li>
-        <Link href="/dashboard" className="">
-          Dashboard
-        </Link>
-      </li>
-      <li>
-        <Link href="/dashboard/profile" className="">
-          Profile
-        </Link>
-      </li>
-      <li>
-        <Link href="/dashboard/all-notes" className="">
-          All Notes
-        </Link>
-      </li>
-      <li>
-        <Link href="/dashboard/add-note" className="">
-          Add Note
-        </Link>
-      </li>
-      <li>
-        <Link href="/dashboard/image" className="">
-          Image
-        </Link>
-      </li>
-    </>
-  );
-
   const handleLogout = async () => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
-      method: "POST",
-      credentials: "include",
+    const result = await Swal.fire({
+      title: "Logout Confirmation",
+      text: "Are you sure you want to logout?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, logout",
+      cancelButtonText: "Cancel",
     });
-    const data = await res.json();
 
-    if (data.success) {
-      // Handle successful logout
-      router.push("/login");
-    } else {
+    if (!result.isConfirmed) return;
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+      const data = await res.json();
+
+      if (data.success) {
+        await Swal.fire({
+          icon: "success",
+          title: "Logged Out",
+          text: "You have been successfully logged out",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+        router.push("/login");
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Logout Failed",
+          text: data.message || data.error || "Something went wrong",
+        });
+      }
+    } catch (error) {
       Swal.fire({
         icon: "error",
-        title: "Logout Failed",
-        text: data.message || data.error || "Something went wrong",
+        title: "Error",
+        text:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
       });
     }
   };
 
+  const isActiveLink = (href: string) => {
+    if (href === "/dashboard") {
+      return pathname === "/dashboard";
+    }
+    return pathname?.startsWith(href) && href !== "/";
+  };
+
   return (
-    <div className="shadow-sm w-full sticky top-0 z-50 bg-base-100/70">
-      <div className="navbar bg-base-100 shadow-sm">
+    <div className="w-full sticky top-0 z-50 bg-base-100/95 backdrop-blur-md border-b border-base-300">
+      <div className="navbar max-w-7xl mx-auto px-4">
         <div className="navbar-start">
           <div className="dropdown">
             <div
               tabIndex={0}
               role="button"
-              className="btn btn-ghost btn-circle"
+              className="btn btn-ghost btn-circle hover:bg-primary/10"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              aria-label="Open menu"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                {" "}
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h7"
-                />{" "}
-              </svg>
+              <FaBars className="h-5 w-5" />
             </div>
             <ul
               tabIndex={0}
-              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
+              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[100] mt-3 w-64 p-2 shadow-xl border border-base-300"
             >
-              {navLinks}
+              {navigationLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className={`flex items-center gap-3 py-3 px-4 rounded-lg transition-all ${
+                      isActiveLink(link.href)
+                        ? "bg-primary text-white font-semibold"
+                        : "hover:bg-base-200"
+                    }`}
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    <span className="text-lg">{link.icon}</span>
+                    <span>{link.label}</span>
+                  </Link>
+                </li>
+              ))}
+              <div className="divider my-1"></div>
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-error/10 hover:text-error transition-all w-full text-left"
+                >
+                  <FaSignOutAlt className="text-lg" />
+                  <span>Logout</span>
+                </button>
+              </li>
             </ul>
           </div>
         </div>
+
         <div className="navbar-center">
           <Logo />
         </div>
+
         <div className="navbar-end flex items-center gap-2">
-          {/* <button className="btn btn-ghost btn-circle">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              {" "}
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />{" "}
-            </svg>
-          </button> */}
-          {/* <button className="btn btn-ghost btn-circle">
-            <div className="indicator">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+          {/* User Profile Avatar */}
+          {user && (
+            <div className="dropdown dropdown-end hidden sm:block">
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn btn-ghost btn-circle avatar ring-2 ring-primary/20 hover:ring-primary/40 transition-all"
               >
-                {" "}
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                />{" "}
-              </svg>
-              <span className="badge badge-xs badge-primary indicator-item"></span>
+                <div className="w-10 rounded-full">
+                  {user?.photo?.profile ? (
+                    <Image
+                      src={user.photo.profile}
+                      alt={user?.name || "User"}
+                      width={40}
+                      height={40}
+                      className="rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold">
+                      {user?.name?.charAt(0).toUpperCase() ||
+                        user?.email?.charAt(0).toUpperCase() ||
+                        "U"}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <ul
+                tabIndex={0}
+                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[100] mt-3 w-56 p-2 shadow-xl border border-base-300"
+              >
+                <li className="menu-title px-4 py-2">
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-base-content">
+                      {user?.name || "User"}
+                    </span>
+                    <span className="text-xs text-base-content/60">
+                      {user?.email}
+                    </span>
+                  </div>
+                </li>
+                <div className="divider my-1"></div>
+                <li>
+                  <Link
+                    href="/dashboard/profile"
+                    className="flex items-center gap-2"
+                  >
+                    <FaUser />
+                    <span>Profile</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/dashboard/update-password"
+                    className="flex items-center gap-2"
+                  >
+                    <FaLock />
+                    <span>Change Password</span>
+                  </Link>
+                </li>
+                <div className="divider my-1"></div>
+                <li>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 text-error hover:bg-error/10"
+                  >
+                    <FaSignOutAlt />
+                    <span>Logout</span>
+                  </button>
+                </li>
+              </ul>
             </div>
-          </button> */}
+          )}
+
           <ThemeToggle />
+
           <button
             onClick={handleLogout}
-            className="btn btn-primary text-neutral"
+            className="btn btn-primary btn-sm text-neutral gap-2 hidden lg:flex"
           >
-            Log Out
+            <FaSignOutAlt />
+            <span>Logout</span>
           </button>
         </div>
       </div>

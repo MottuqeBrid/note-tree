@@ -39,7 +39,6 @@ export default function Page() {
         }
       );
       const data = await res.json();
-      console.log(data);
       const arr = data?.users || [];
       setUsers(Array.isArray(arr) ? arr : []);
     } catch (e) {

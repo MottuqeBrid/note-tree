@@ -127,7 +127,6 @@ export default function CoverDemoForm({ initial, onSaved }: Props) {
         setError(data?.message || "Failed to save");
       }
     } catch (err) {
-      console.error(err);
       setError("Unexpected error");
     } finally {
       setSaving(false);

@@ -135,7 +135,6 @@ export default function ProfilePage() {
         credentials: "include",
       });
       const data = await res.json();
-      console.log(data.user);
       setUser(data.user);
     } catch (err) {
       console.error("Failed to fetch user:", err);
@@ -150,7 +149,6 @@ export default function ProfilePage() {
   const uploadImage = async (file: File, type: "cp" | "pp") => {
     try {
       const data = await uploadFile(file);
-      console.log(data);
       if (data.success) {
         // Update user photo in state
         const updatedUser = { ...user, photo: { ...user?.photo } };

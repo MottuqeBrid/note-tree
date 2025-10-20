@@ -26,7 +26,6 @@ export default function AllNewsletter() {
         const data = await res.json();
         if (data?.success) setList(data.newsletters || []);
       } catch (err) {
-        console.error(err);
       } finally {
         setLoading(false);
       }

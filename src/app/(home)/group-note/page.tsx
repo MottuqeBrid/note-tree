@@ -37,7 +37,6 @@ export default function GroupNotePage() {
         );
         const data = await res.json();
         if (data.success) {
-          console.log(data);
           setGroups(data.groups || []);
         }
       } catch (e) {

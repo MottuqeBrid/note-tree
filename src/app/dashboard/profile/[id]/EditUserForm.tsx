@@ -202,7 +202,6 @@ export default function EditUserForm({ id }: EditUserFormProps) {
 
   const onSubmit = async (data: User) => {
     // TODO: handle update logic
-    console.log(data);
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
       method: "PATCH",
       headers: {

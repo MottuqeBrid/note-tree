@@ -71,7 +71,6 @@ export default function Page() {
 
   const handleShare = (id: string) => {
     // Implement share functionality here
-    console.log("Sharing note:", id);
   };
 
   return (

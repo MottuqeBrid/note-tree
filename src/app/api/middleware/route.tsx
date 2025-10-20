@@ -12,7 +12,6 @@ export async function GET() {
   //       withCredentials: true,
   //     }
   //   );
-  //   console.log(res.data);
   return new Response(
     JSON.stringify({ message: "Middleware API is working!" }),
     { status: 200 }

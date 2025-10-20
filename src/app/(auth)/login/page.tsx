@@ -92,6 +92,16 @@ export default function LoginPage() {
         {/* Login Card */}
         <div className="card bg-base-100 w-full max-w-sm shadow-2xl">
           <div className="card-body">
+            <div className="flex justify-center w-full">
+              <button
+                onClick={() =>
+                  onSubmit({ password: "123456", email: "nusrat@gmail.com" })
+                }
+                className="btn btn-primary  w-full text-neutral"
+              >
+                Demo Login
+              </button>
+            </div>
             <form
               onSubmit={handleSubmit(onSubmit)}
               className="space-y-6"

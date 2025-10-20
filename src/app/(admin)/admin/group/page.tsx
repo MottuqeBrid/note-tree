@@ -46,7 +46,6 @@ export default function Page() {
         cache: "no-store",
       });
       const data = await res.json();
-      console.log(data);
       setGroups(
         Array.isArray(data?.groups)
           ? data.groups
@@ -55,7 +54,6 @@ export default function Page() {
           : []
       );
     } catch (e) {
-      console.error(e);
     } finally {
       setLoading(false);
     }
@@ -280,9 +278,7 @@ function CreateGroupForm({
           const uniq = Array.from(new Set(existing.members));
           setSelectedMembers(opts.filter((o) => uniq.includes(o.value)));
         }
-      } catch (e) {
-        console.error(e);
-      }
+      } catch (e) {}
     };
     fetchUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -326,7 +322,6 @@ function CreateGroupForm({
 
       onSaved();
     } catch (e) {
-      console.error(e);
     } finally {
       setSaving(false);
     }

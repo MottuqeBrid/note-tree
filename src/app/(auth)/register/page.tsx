@@ -42,7 +42,7 @@ export default function RegisterPage() {
         }
       );
       const resData = await res.json();
-      console.log(resData);
+
       if (resData.success) {
         // Set token in cookies if returned from backend
         if (resData.token) {

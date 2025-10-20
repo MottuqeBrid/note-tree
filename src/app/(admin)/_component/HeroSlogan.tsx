@@ -32,9 +32,7 @@ export default function HeroSlogan() {
             image: data.hero?.image || "",
           });
         }
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) {}
     })();
   }, []);
 
@@ -63,14 +61,12 @@ export default function HeroSlogan() {
         }
       );
       const data = await res.json();
-      console.log(data);
       if (data?.success) {
         Swal.fire({ icon: "success", text: "Hero updated" });
       } else {
         Swal.fire({ icon: "error", text: data?.message || "Failed" });
       }
     } catch (err) {
-      console.error(err);
       Swal.fire({ icon: "error", text: "Unexpected error" });
     } finally {
       setSaving(false);

@@ -41,7 +41,6 @@ export default function GroupPage({ id }: { id: string }) {
       if (data?.success) setGroup(data.group);
       else setGroup(null);
     } catch (e) {
-      console.error(e);
       setGroup(null);
     }
   }, [id]);
@@ -295,7 +294,6 @@ function PostForm({
       await res.json();
       onSaved();
     } catch (e) {
-      console.error(e);
     } finally {
       setSaving(false);
     }

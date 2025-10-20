@@ -20,7 +20,7 @@ export async function middleware(request: NextRequest) {
   let token =
     request.cookies.get("token")?.value ||
     request.cookies.get("auth_token")?.value;
-  console.log("Token:", token);
+  // console.log("Token:", token);
   // Fallback: parse raw Cookie header if request.cookies is empty on certain Edge runtimes
   if (!token && cookieHeader) {
     const m =
@@ -47,7 +47,7 @@ export async function middleware(request: NextRequest) {
   if (!publicPaths.includes(pathname) && !token) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
-  console.log(cookieHeader);
+  // console.log(cookieHeader);
   try {
     // fallback to the current origin when NEXT_PUBLIC_API_URL isn't provided
     const apiBase = process.env.NEXT_PUBLIC_API_URL || request.nextUrl.origin;
@@ -59,7 +59,7 @@ export async function middleware(request: NextRequest) {
         Cookie: `token=${token}; ${cookieHeader}`,
       },
     });
-    console.log("Middleware response status:", await res.json());
+    // console.log("Middleware response status:", await res.json());
     // If the upstream is unavailable (network error or non-2xx), don't hard-fail the app on Vercel.
     if (!res.ok) {
       console.error(

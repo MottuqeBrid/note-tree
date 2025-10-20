@@ -139,7 +139,6 @@ export default function CoverPage() {
       const remote = data?.cover || {};
       remote.date = formatDateForInput(remote?.date);
       setData(remote);
-      console.log(remote);
       setDesign(remote?.Category || remote?.category);
       setAsOrLabs(remote?.coverType === "lab test" ? "lab test" : "assignment");
     } else {
@@ -197,7 +196,6 @@ export default function CoverPage() {
       }
     } catch (error) {
       toast.error("Failed to create cover page.");
-      console.log(error);
     } finally {
       const wrapper = base
         .closest(".print-area")

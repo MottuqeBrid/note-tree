@@ -83,10 +83,8 @@ export default function AddNote() {
   //     };
   //     // Append files with name and file object
   //     await data?.files?.forEach(async (f) => {
-  //       console.log("Processing file:", f);
   //       if (f.file) {
   //         const file = await uploadFile(f.file);
-  //         console.log("Uploaded file data:", file);
   //       }
   //     });
 
@@ -139,7 +137,6 @@ export default function AddNote() {
         ...data,
         files: uploadedFiles,
       };
-      console.log("Submitting data:", newdata);
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/notes/create`,
         {
