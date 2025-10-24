@@ -134,7 +134,7 @@ export default function Navbar() {
         </div>
         <div className="navbar-end">
           <div className="flex gap-2">
-            <ThemeToggle />
+            {/* <ThemeToggle /> */}
             {authLink}
           </div>
         </div>
