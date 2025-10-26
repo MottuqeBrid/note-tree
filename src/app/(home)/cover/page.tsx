@@ -237,7 +237,7 @@ export default function CoverPage() {
         undefined,
         "FAST"
       );
-      pdf.save(`${data.title || "cover-page"}.pdf`);
+      pdf.save(`${data.studentId}-${data.title || "cover-page"}.pdf`);
     }
   };
 
