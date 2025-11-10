@@ -2,7 +2,8 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 // ...existing code...
-import { FaSearch, FaEye } from "react-icons/fa";
+import { FaSearch, FaEye, FaTrash } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 type Cover = {
   _id: string;
@@ -12,26 +13,35 @@ type Cover = {
   section?: string;
   teacherName?: string;
   studentName?: string;
-  thumbnail?: string;
+  studentId?: string;
   createdAt?: string;
+  Category?: string;
+  year?: string;
+  term?: string;
+  teacherDiscipline?: string;
+  teacherInstitute?: string;
+  studentDiscipline?: string;
+  studentInstitute?: string;
+  coverType?: string;
   user?: {
     _id?: string;
     name?: string;
     email?: string;
     phone?: string;
     createdAt?: string;
+    cover?: unknown[];
+    note?: unknown[];
     role?: string;
     isVerified?: boolean;
     photo?: { profile?: string } | null;
   } | null;
-  cover?: unknown[];
-  note?: unknown[];
 };
 
 export default function Page() {
   const [covers, setCovers] = useState<Cover[]>([]);
   const [selected, setSelected] = useState<Cover | null>(null);
   const [loading, setLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
 
   const fetchCovers = async () => {
@@ -46,6 +56,7 @@ export default function Page() {
       const arr = data?.covers || [];
       setCovers(Array.isArray(arr) ? arr : []);
     } catch (e) {
+      console.error("fetchCovers error", e);
     } finally {
       setLoading(false);
     }
@@ -135,6 +146,45 @@ export default function Page() {
                   >
                     <FaEye /> View
                   </button>
+                  <button
+                    onClick={async () => {
+                      if (!c._id) return;
+                      Swal.fire({
+                        title: "Are you sure?",
+                        text: "Delete this cover? This cannot be undone.",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Delete",
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#3085d6",
+                      }).then(async (result) => {
+                        if (result.isConfirmed) {
+                          setDeletingId(c._id);
+                          const resp = await fetch(
+                            `${process.env.NEXT_PUBLIC_API_URL}/covers/delete/${c._id}`,
+                            {
+                              method: "DELETE",
+                              credentials: "include",
+                            }
+                          );
+                          if (!resp.ok) {
+                            const txt = await resp.text().catch(() => "");
+                            throw new Error(
+                              `Delete failed: ${resp.status} ${resp.statusText} ${txt}`
+                            );
+                          }
+                          setCovers((prev) =>
+                            prev.filter((x) => x._id !== c._id)
+                          );
+                          if (selected?._id === c._id) setSelected(null);
+                        }
+                      });
+                    }}
+                    className="btn btn-xs btn-ghost text-error flex items-center gap-2"
+                    aria-disabled={deletingId === c._id}
+                  >
+                    <FaTrash /> {deletingId === c._id ? "Deleting…" : "Delete"}
+                  </button>
                 </div>
               </div>
 
@@ -147,14 +197,14 @@ export default function Page() {
                       : "—"}
                   </div>
                 </div>
-                <div className="flex items-center gap-4 mt-2">
+                {/* <div className="flex items-center gap-4 mt-2">
                   <div className="badge badge-ghost badge-sm">
                     Covers: {Array.isArray(c.cover) ? c.cover.length : 0}
                   </div>
                   <div className="badge badge-ghost badge-sm">
                     Notes: {Array.isArray(c.note) ? c.note.length : 0}
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </article>
@@ -196,11 +246,15 @@ export default function Page() {
                   </div>
                   <div className="mt-2">
                     Covers:{" "}
-                    {Array.isArray(selected.cover) ? selected.cover.length : 0}
+                    {Array.isArray(selected.user?.cover)
+                      ? selected.user?.cover.length
+                      : 0}
                   </div>
                   <div>
                     Notes:{" "}
-                    {Array.isArray(selected.note) ? selected.note.length : 0}
+                    {Array.isArray(selected?.user?.note)
+                      ? selected.user?.note.length
+                      : 0}
                   </div>
                 </div>
               </div>
@@ -208,26 +262,24 @@ export default function Page() {
               <div className="md:col-span-1">
                 <div className="text-sm text-gray-800 whitespace-pre-line">
                   {`COVER PAGE (ASSIGNMENT)
-Category: ${selected.cover && selected.cover.length ? "design4" : "design4"}
+Category: ${selected.Category || "design4"}
 Title: ${selected.title || "—"}
 Course: ${selected.courseCode || "—"} ${
-                    selected.courseTitle ? "- " + selected.courseTitle : ""
+                    selected.courseCode ? "- " + selected.courseTitle : ""
                   }
 Section: ${selected.section || "—"}
-Student: ${selected.user?.name || selected.studentName || "—"} (${
-                    selected.user?._id || "—"
-                  })
+Student: ${selected.studentName || "Name Not Provided"}
 Student Discipline: ${"Computer Science & Engineering"}
 Degree: ${"B.Sc. Engineering"}
 Teacher: ${selected.teacherName || "—"}
-Teacher Discipline: ${"Algorithms & Complexity"}
+Teacher Discipline: ${selected.teacherDiscipline || "—"}
 Institutes: ${
-                    selected.user?.name
-                      ? "Student @ Global Tech University; Teacher @ Global Tech University"
-                      : "—"
+                    selected.teacherInstitute
+                      ? selected.teacherInstitute
+                      : "Khulna University"
                   }
-Year: ${"3rd Year"}
-Term: ${"1st Term"}
+Year: ${selected.year || "3rd Year"}
+Term: ${selected.term || "1st Term"}
 Date: ${
                     selected.createdAt
                       ? new Date(selected.createdAt).toLocaleDateString()
