@@ -116,12 +116,7 @@ const CoverDesign5 = forwardRef<HTMLDivElement, CoverDesign5Props>(
                 {safe(formData.coverType)}
               </p>
             </div>
-            <p
-              className="text-[120px] font-black tracking-tighter leading-none uppercase text-transparent bg-clip-text"
-              style={{
-                background: `linear-gradient(90deg, ${accent}, ${secondary})`,
-              }}
-            >
+            <p className="text-[120px] font-black tracking-tighter leading-none uppercase bg-clip-text">
               ON
             </p>
             <h2

@@ -149,10 +149,12 @@ const CoverDesign8 = forwardRef<HTMLDivElement, CoverDesign8Props>(
                 </p>
               </div>
               <p
-                className="text-[110px] font-black uppercase leading-none tracking-tight text-transparent bg-clip-text"
-                style={{
-                  background: `linear-gradient(90deg, ${accent}, ${accentAlt})`,
-                }}
+                className="text-[110px] font-black uppercase leading-none tracking-tight text- bg-clip-text"
+                style={
+                  {
+                    // background: `linear-gradient(90deg, ${accent}, ${accentAlt})`,
+                  }
+                }
               >
                 ON
               </p>

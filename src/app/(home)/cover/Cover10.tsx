@@ -206,7 +206,7 @@ const CoverDesign10 = forwardRef<HTMLDivElement, CoverDesign10Props>(
                 background: `linear-gradient(90deg, ${accent}, ${primary})`,
               }}
             />
-            <div className="mt-14 flex items-center gap-4">
+            <div className="mt-14 flex items-center flex-col gap-4">
               <span
                 className="px-10 py-4 rounded-full border-[6px] bg-white/90 backdrop-blur-sm text-[40px] font-extrabold uppercase tracking-wide"
                 style={{ borderColor: accent, color: primary }}
@@ -214,10 +214,10 @@ const CoverDesign10 = forwardRef<HTMLDivElement, CoverDesign10Props>(
                 {safe(formData.coverType)}
               </span>
               <span
-                className="text-[120px] font-black bg-clip-text text-transparent leading-none"
-                style={{
-                  background: `linear-gradient(90deg, ${primary}, ${accent})`,
-                }}
+                className="text-[120px] font-black bg-clip-text leading-none"
+                // style={{
+                //   background: `linear-gradient(90deg, ${primary}, ${accent})`,
+                // }}
               >
                 ON
               </span>

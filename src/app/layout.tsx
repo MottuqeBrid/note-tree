@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Raleway } from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
-const raleway = Raleway({
-  variable: "--font-raleway",
+
+const roboto = Roboto({
   subsets: ["latin"],
+  weight: ["400", "700"], // or whatever weights you need
 });
 
 export const metadata: Metadata = {
@@ -19,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="light">
-      <body className={`${raleway.variable} antialiased`}>{children}</body>
+      <body className={`${roboto.className} antialiased`}>{children}</body>
     </html>
   );
 }

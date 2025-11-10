@@ -19,6 +19,7 @@ import {
   CoverDesign3,
   CoverDesign4,
 } from "./CoverDesigns";
+import { CoverDesign13 } from "./Cover13";
 import { Cover2Blue, Cover2Green, Cover2Purple, Cover2Red } from "./Cover2";
 import { CoverDesign5 } from "./Cover5";
 import { CoverDesign6 } from "./Cover6";
@@ -110,6 +111,7 @@ export default function CoverPage() {
     | "design10"
     | "design11"
     | "design12"
+    | "design13"
   >("design1");
   const designRef = useRef<HTMLDivElement | null>(null);
 
@@ -194,7 +196,7 @@ export default function CoverPage() {
       } else {
         toast.error("Failed to create cover page.");
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to create cover page.");
     } finally {
       const wrapper = base
@@ -294,6 +296,7 @@ export default function CoverPage() {
                   "design10",
                   "design11",
                   "design12",
+                  "design13",
                 ] as const
               ).map((d) => (
                 <button
@@ -393,6 +396,11 @@ export default function CoverPage() {
                   key: "design12" as const,
                   label: "Design 12",
                   Comp: CoverDesign12,
+                },
+                {
+                  key: "design13" as const,
+                  label: "Design 13",
+                  Comp: CoverDesign13,
                 },
               ].map(({ key, label, Comp }) => (
                 <button
@@ -822,6 +830,19 @@ export default function CoverPage() {
               data-theme="light"
             >
               <CoverDesign12 ref={designRef} formData={printable} />
+            </motion.div>
+          )}
+          {design === "design13" && (
+            <motion.div
+              key="design13"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="print-area mx-auto cover-theme-lock"
+              data-theme="light"
+            >
+              <CoverDesign13 ref={designRef} formData={printable} />
             </motion.div>
           )}
         </AnimatePresence>

@@ -39,7 +39,10 @@ export default function LoginPage() {
       if (resData.success) {
         // Set token in cookies if returned from backend
         if (resData.token) {
-          Cookies.set("auth_token", resData.token, { expires: 30, path: "/" });
+          Cookies.set("auth_token", resData?.token, {
+            expires: 100, // 100 days
+            path: "/",
+          });
         }
         Swal.fire({
           title: "Login Successful",

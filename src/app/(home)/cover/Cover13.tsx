@@ -3,7 +3,7 @@ import React, { forwardRef } from "react";
 import { format } from "date-fns";
 import { CoverData, ResponsiveWrapper } from "./CoverDesigns";
 
-export interface CoverDesign12Props {
+export interface CoverDesign13Props {
   formData: CoverData;
   className?: string;
   accent?: string;
@@ -11,14 +11,14 @@ export interface CoverDesign12Props {
   neutral?: string;
 }
 
-const CoverDesign12 = forwardRef<HTMLDivElement, CoverDesign12Props>(
+const CoverDesign13 = forwardRef<HTMLDivElement, CoverDesign13Props>(
   (
     {
       formData,
       className,
-      accent = "#2563eb", // blue-600
-      accentAlt = "#3b82f6", // blue-500
-      neutral = "#0f172a", // slate-900
+      accent = "#f97316", // orange-500
+      accentAlt = "#fb923c", // orange-400
+      neutral = "#0f172a",
     },
     ref
   ) => {
@@ -101,11 +101,14 @@ const CoverDesign12 = forwardRef<HTMLDivElement, CoverDesign12Props>(
               {safe(formData.coverType)}
             </span>
           </div>
+
+          {/* The requested "ON" pill placed near title */}
           <div className="absolute left-[320px] top-[600px]">
             <span className="inline-block px-8 py-4 rounded-xl border-[3px] bg-white/90 backdrop-blur-sm text-[24px] font-extrabold uppercase tracking-wide shadow">
               ON
             </span>
           </div>
+
           {/* Title */}
           <div className="absolute left-[180px] top-[720px] w-[580px] text-start">
             <h2
@@ -210,7 +213,7 @@ const CoverDesign12 = forwardRef<HTMLDivElement, CoverDesign12Props>(
     );
   }
 );
-CoverDesign12.displayName = "CoverDesign12";
+CoverDesign13.displayName = "CoverDesign13";
 
-export { CoverDesign12 };
-export default CoverDesign12;
+export { CoverDesign13 };
+export default CoverDesign13;

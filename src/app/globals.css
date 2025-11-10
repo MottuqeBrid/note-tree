@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
-@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"); */
 
 @plugin "daisyui/theme" {
   name: "light";
@@ -20,7 +20,7 @@
   --color-base-100: #080a00;
   --color-neutral: #fafee7;
 }
-
+/* 
 body {
   font-family: "Roboto", sans-serif;
-}
+} */
