@@ -85,6 +85,7 @@ export default function Page() {
         <div>
           <h1 className="text-2xl font-bold">Cover Pages</h1>
           <p className="text-sm text-gray-500">All generated covers</p>
+          <p className="text-sm text-gray-500">Total covers: {covers.length}</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
