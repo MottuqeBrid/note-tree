@@ -117,7 +117,7 @@ export const CoverDesign1 = forwardRef<HTMLDivElement, DesignProps>(
           className="design-base bg-white relative overflow-hidden z-70 w-[1240px] h-[1740px] print:w-[1240px] print:h-[1740px]"
         >
           {/* Blue Circle (slightly reduced to avoid print overflow) */}
-          <div className="absolute w-[860px] bg-white h-[860px] border-[140px] border-[#4472c4] rounded-full right-[-430px] top-[-340px] z-20" />
+          <div className="absolute w-[860px] bg-white h-[860px] border-[140px] border-[#1e40af] rounded-full right-[-430px] top-[-340px] z-20" />
 
           {/* University Header */}
           <div className="absolute top-[95px] left-[70px] flex items-center gap-4 z-30 drop-shadow-sm">
@@ -144,12 +144,12 @@ export const CoverDesign1 = forwardRef<HTMLDivElement, DesignProps>(
             <div className="absolute w-[700px] h-[700px] bg-white rounded-full right-[-190px] top-[-290px] opacity-90" />
 
             {/* Assignment / Lab Text */}
-            <div className="absolute top-[10%] left-[8%] text-[38px] text-[#4472c4] font-bold uppercase border-2 border-black py-[18px] px-[44px] tracking-wide bg-white/80 backdrop-blur-sm">
+            <div className="absolute top-[10%] left-[8%] text-[38px] text-[#1e40af] font-bold uppercase border-2 border-black py-[18px] px-[44px] tracking-wide bg-white/80 backdrop-blur-sm">
               {formData.coverType}
             </div>
 
             {/* ON Text */}
-            <div className="absolute top-[25%] left-[18%] text-[48px] text-[#588413] font-semibold">
+            <div className="absolute top-[25%] left-[18%] text-[48px] text-[#166534] font-semibold">
               ON
             </div>
 
@@ -159,7 +159,7 @@ export const CoverDesign1 = forwardRef<HTMLDivElement, DesignProps>(
             </div>
 
             {/* Course Info (standardized larger headings) */}
-            <div className="absolute text-start top-[69%] left-[8%] text-[19px] text-[#30548a] space-y-6">
+            <div className="absolute text-start top-[69%] left-[8%] text-[19px] text-[#1e3a8a] space-y-6">
               <h1 className="font-bold text-3xl">
                 Course Title: {formData.courseTitle}
               </h1>
@@ -177,18 +177,18 @@ export const CoverDesign1 = forwardRef<HTMLDivElement, DesignProps>(
           {/* Submission Table */}
           <table className="absolute top-[68%] left-[10%] w-[80%] border-collapse shadow-md">
             <thead>
-              <tr className="bg-[#4472c4]">
-                <th className="p-[25px_10px] text-[35px] font-bold text-center border-2 border-[#4472c4]">
+              <tr className="bg-[#1e40af]">
+                <th className="p-[25px_10px] text-[35px] font-bold text-center border-2 border-[#1e40af]">
                   SUBMITTED BY
                 </th>
-                <th className="p-[25px_10px] text-[35px] font-bold text-center border-2 border-[#4472c4]">
+                <th className="p-[25px_10px] text-[35px] font-bold text-center border-2 border-[#1e40af]">
                   SUBMITTED TO
                 </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="p-[20px] text-[29px] font-semibold border-2 border-[#4472c4] bg-[#d9e2f3] leading-[1.22]">
+                <td className="p-[20px] text-[29px] font-semibold border-2 border-[#1e40af] bg-[#dbeafe] leading-[1.22]">
                   NAME: {formData.studentName}
                   <br />
                   ID: {formData.studentId}
@@ -200,7 +200,7 @@ export const CoverDesign1 = forwardRef<HTMLDivElement, DesignProps>(
                   {formData.studentDiscipline} Discipline <br />
                   {formData.studentInstitute}
                 </td>
-                <td className="p-[10px] text-[29px] font-semibold border-2 border-[#4472c4] bg-[#d9e2f3] leading-[1.22]">
+                <td className="p-[10px] text-[29px] font-semibold border-2 border-[#1e40af] bg-[#dbeafe] leading-[1.22]">
                   {formData.teacherName},
                   <br />
                   {formData.degree}, <br />
@@ -236,7 +236,7 @@ export const CoverDesign1 = forwardRef<HTMLDivElement, DesignProps>(
               style={{ width: "400px", height: "400px" }}
               className=""
             >
-              <path d="M0,0 Q40,150 250,200 L0,200 Z" fill="#4472c4" />
+              <path d="M0,0 Q40,150 250,200 L0,200 Z" fill="#1e40af" />
             </svg>
           </div>
         </div>
@@ -637,3 +637,4 @@ CoverDesign4.displayName = "CoverDesign4";
 
 const CoverDesigns = { CoverDesign1, CoverDesign2, CoverDesign3, CoverDesign4 };
 export default CoverDesigns;
+

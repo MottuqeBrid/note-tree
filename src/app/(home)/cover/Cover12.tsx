@@ -20,7 +20,7 @@ const CoverDesign12 = forwardRef<HTMLDivElement, CoverDesign12Props>(
       accentAlt = "#3b82f6", // blue-500
       neutral = "#0f172a", // slate-900
     },
-    ref
+    ref,
   ) => {
     const safe = (v: string) => v || "—";
     const dateFmt = (() => {
@@ -193,22 +193,13 @@ const CoverDesign12 = forwardRef<HTMLDivElement, CoverDesign12Props>(
           </div>
 
           {/* Watermark */}
-          <div className="absolute -bottom-20 -right-10 opacity-[0.06] select-none pointer-events-none">
-            <h1
-              className="font-black text-[340px] tracking-tighter"
-              style={{
-                background: `linear-gradient(90deg, ${accent}, ${accentAlt})`,
-                WebkitBackgroundClip: "text",
-                color: "transparent",
-              }}
-            >
-              KU
-            </h1>
+          <div className="absolute -bottom-20 -right-10 opacity-[0.07] select-none pointer-events-none">
+            <h1 className="font-black text-[340px] tracking-tighter">KU</h1>
           </div>
         </div>
       </ResponsiveWrapper>
     );
-  }
+  },
 );
 CoverDesign12.displayName = "CoverDesign12";
 

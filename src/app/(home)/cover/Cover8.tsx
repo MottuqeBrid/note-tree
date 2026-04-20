@@ -21,10 +21,10 @@ const CoverDesign8 = forwardRef<HTMLDivElement, CoverDesign8Props>(
     {
       formData,
       className,
-      accent = "#0f766e", // teal-700
+      accent = "#0d9488", // teal-700
       accentAlt = "#14b8a6", // teal-500
     },
-    ref
+    ref,
   ) => {
     const safe = (v: string) => v || "—";
     const dateFmt = (() => {
@@ -131,9 +131,16 @@ const CoverDesign8 = forwardRef<HTMLDivElement, CoverDesign8Props>(
             />
             {/* Large watermark */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-              <span className="text-[250px] font-black tracking-tighter text-[rgba(0,0,0,0.03)] leading-none">
+              <h1
+                className="font-black text-[300px] text-gray-700 tracking-tighter"
+                // style={{
+                //   background: `linear-gradient(90deg, ${secondary}, ${primary})`,
+                //   WebkitBackgroundClip: "text",
+                //   color: "transparent",
+                // }}
+              >
                 KU
-              </span>
+              </h1>
             </div>
 
             <div className="relative z-10">
@@ -187,7 +194,7 @@ const CoverDesign8 = forwardRef<HTMLDivElement, CoverDesign8Props>(
         </div>
       </ResponsiveWrapper>
     );
-  }
+  },
 );
 CoverDesign8.displayName = "CoverDesign8";
 

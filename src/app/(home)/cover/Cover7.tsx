@@ -22,11 +22,11 @@ const CoverDesign7 = forwardRef<HTMLDivElement, CoverDesign7Props>(
     {
       formData,
       className,
-      primary = "#9333ea", // purple-600
-      secondary = "#4f46e5", // indigo-600
-      dark = "#1e1b4b", // dark indigo
+      primary = "#7c3aed", // purple-600
+      secondary = "#6366f1", // indigo-600
+      dark = "#312e81", // dark indigo
     },
-    ref
+    ref,
   ) => {
     const safe = (v: string) => v || "—";
     const dateStr = (() => {
@@ -175,14 +175,14 @@ const CoverDesign7 = forwardRef<HTMLDivElement, CoverDesign7Props>(
           </section>
 
           {/* Date Footer */}
-          <footer className="relative z-10 mt-auto mb-24 px-24 text-white/90">
+          <footer className="relative z-10 mt-auto mb-24 px-24">
             <p className="text-[24px] tracking-wide">Date of Submission</p>
-            <p className="mt-2 text-[38px] font-bold text-white">{dateStr}</p>
+            <p className="mt-2 text-[38px] font-bold">{dateStr}</p>
           </footer>
         </div>
       </ResponsiveWrapper>
     );
-  }
+  },
 );
 CoverDesign7.displayName = "CoverDesign7";
 

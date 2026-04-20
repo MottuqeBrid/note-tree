@@ -16,11 +16,11 @@ const CoverDesign13 = forwardRef<HTMLDivElement, CoverDesign13Props>(
     {
       formData,
       className,
-      accent = "#f97316", // orange-500
-      accentAlt = "#fb923c", // orange-400
+      accent = "#f59e0b", // orange-500
+      accentAlt = "#fbbf24", // orange-400
       neutral = "#0f172a",
     },
-    ref
+    ref,
   ) => {
     const safe = (v: string) => v || "—";
     const dateFmt = (() => {
@@ -199,11 +199,11 @@ const CoverDesign13 = forwardRef<HTMLDivElement, CoverDesign13Props>(
           <div className="absolute -bottom-20 -right-10 opacity-[0.06] select-none pointer-events-none">
             <h1
               className="font-black text-[340px] tracking-tighter"
-              style={{
-                background: `linear-gradient(90deg, ${accent}, ${accentAlt})`,
-                WebkitBackgroundClip: "text",
-                color: "transparent",
-              }}
+              // style={{
+              //   background: `linear-gradient(90deg, ${accent}, ${accentAlt})`,
+              //   WebkitBackgroundClip: "text",
+              //   color: "transparent",
+              // }}
             >
               KU
             </h1>
@@ -211,7 +211,7 @@ const CoverDesign13 = forwardRef<HTMLDivElement, CoverDesign13Props>(
         </div>
       </ResponsiveWrapper>
     );
-  }
+  },
 );
 CoverDesign13.displayName = "CoverDesign13";
 

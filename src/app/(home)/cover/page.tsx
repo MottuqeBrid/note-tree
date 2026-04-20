@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -29,6 +29,7 @@ import { CoverDesign9 } from "./Cover9";
 import { CoverDesign10 } from "./Cover10";
 import { CoverDesign11 } from "./Cover11";
 import { CoverDesign12 } from "./Cover12";
+import { CoverDesign14 } from "./Cover14";
 import html2canvas from "html2canvas-pro";
 import jsPDF from "jspdf";
 import { toast, ToastContainer } from "react-toastify";
@@ -112,6 +113,7 @@ export default function CoverPage() {
     | "design11"
     | "design12"
     | "design13"
+    | "design14"
   >("design1");
   const designRef = useRef<HTMLDivElement | null>(null);
 
@@ -297,6 +299,7 @@ export default function CoverPage() {
                   "design11",
                   "design12",
                   "design13",
+                  "design14",
                 ] as const
               ).map((d) => (
                 <button
@@ -401,6 +404,11 @@ export default function CoverPage() {
                   key: "design13" as const,
                   label: "Design 13",
                   Comp: CoverDesign13,
+                },
+                {
+                  key: "design14" as const,
+                  label: "Design 14",
+                  Comp: CoverDesign14,
                 },
               ].map(({ key, label, Comp }) => (
                 <button
@@ -843,6 +851,19 @@ export default function CoverPage() {
               data-theme="light"
             >
               <CoverDesign13 ref={designRef} formData={printable} />
+            </motion.div>
+          )}
+          {design === "design14" && (
+            <motion.div
+              key="design14"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="print-area mx-auto cover-theme-lock"
+              data-theme="light"
+            >
+              <CoverDesign14 ref={designRef} formData={printable} />
             </motion.div>
           )}
         </AnimatePresence>

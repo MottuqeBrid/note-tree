@@ -23,11 +23,11 @@ const CoverDesign9 = forwardRef<HTMLDivElement, CoverDesign9Props>(
     {
       formData,
       className,
-      primary = "#1d4ed8", // blue-700
+      primary = "#2563eb", // blue-700
       secondary = "#3b82f6", // blue-500
       accent = "#f59e0b", // amber-500
     },
-    ref
+    ref,
   ) => {
     const safe = (v: string) => v || "—";
     const dateFmt = (() => {
@@ -119,13 +119,13 @@ const CoverDesign9 = forwardRef<HTMLDivElement, CoverDesign9Props>(
               ON
             </p>
             <h2
-              className="mt-12 text-[54px] font-semibold leading-tight max-w-[640px]"
+              className="mt-20 text-[40px] font-semibold leading-tight max-w-[640px]"
               style={{ color: primary }}
             >
               {safe(formData.title)}
             </h2>
             <div
-              className="mt-12 text-[26px] font-medium"
+              className="mt-32 text-[26px] font-medium"
               style={{ color: secondary }}
             >
               <p>
@@ -242,7 +242,7 @@ const CoverDesign9 = forwardRef<HTMLDivElement, CoverDesign9Props>(
         </div>
       </ResponsiveWrapper>
     );
-  }
+  },
 );
 CoverDesign9.displayName = "CoverDesign9";
 

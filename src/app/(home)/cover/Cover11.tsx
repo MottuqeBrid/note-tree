@@ -29,7 +29,7 @@ const CoverDesign11 = forwardRef<HTMLDivElement, CoverDesign11Props>(
       secondary = "#14b8a6", // teal-500
       accent = "#fb923c", // orange-400
     },
-    ref
+    ref,
   ) => {
     const safe = (v: string) => v || "—";
     const dateFmt = (() => {
@@ -245,11 +245,11 @@ const CoverDesign11 = forwardRef<HTMLDivElement, CoverDesign11Props>(
           <div className="absolute -bottom-10 right-0 opacity-[0.08] select-none pointer-events-none">
             <h1
               className="font-black text-[300px] tracking-tighter"
-              style={{
-                background: `linear-gradient(90deg, ${secondary}, ${primary})`,
-                WebkitBackgroundClip: "text",
-                color: "transparent",
-              }}
+              // style={{
+              //   background: `linear-gradient(90deg, ${secondary}, ${primary})`,
+              //   WebkitBackgroundClip: "text",
+              //   color: "transparent",
+              // }}
             >
               KU
             </h1>
@@ -257,7 +257,7 @@ const CoverDesign11 = forwardRef<HTMLDivElement, CoverDesign11Props>(
         </div>
       </ResponsiveWrapper>
     );
-  }
+  },
 );
 CoverDesign11.displayName = "CoverDesign11";
 

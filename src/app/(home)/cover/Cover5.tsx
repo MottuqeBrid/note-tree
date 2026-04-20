@@ -18,7 +18,7 @@ export interface CoverDesign5Props {
 }
 
 const CoverDesign5 = forwardRef<HTMLDivElement, CoverDesign5Props>(
-  ({ formData, className, accent = "#0d47a1", secondary = "#1976d2" }, ref) => {
+  ({ formData, className, accent = "#1e40af", secondary = "#3b82f6" }, ref) => {
     const safe = (v: string) => v || "—";
     const fmtDate = (() => {
       try {

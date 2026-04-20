@@ -40,20 +40,20 @@ const palette: Record<
   }
 > = {
   blue: {
-    heading: "#4472c4",
-    on: "#588413",
-    title: "#588413",
-    course: "#4472c4",
-    tableBg: "#d9e2f3",
-    panelBg: "#d9e2f3",
+    heading: "#2563eb",
+    on: "#166534",
+    title: "#166534",
+    course: "#2563eb",
+    tableBg: "#dbeafe",
+    panelBg: "#dbeafe",
   },
   green: {
-    heading: "#16a34a",
+    heading: "#059669",
     on: "#15803d",
     title: "#166534",
     course: "#14532d",
-    tableBg: "#dcfce7",
-    panelBg: "#dcfce7",
+    tableBg: "#d1fae5",
+    panelBg: "#d1fae5",
   },
   purple: {
     heading: "#7c3aed",

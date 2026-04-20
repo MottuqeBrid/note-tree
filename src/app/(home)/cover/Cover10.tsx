@@ -22,7 +22,7 @@ const CoverDesign10 = forwardRef<HTMLDivElement, CoverDesign10Props>(
       accent = "#f97316", // orange-500
       scheme,
     },
-    ref
+    ref,
   ) => {
     const safe = (v: string) => v || "—";
     // Palette presets (allows quick font/color scheme switching)
@@ -303,7 +303,7 @@ const CoverDesign10 = forwardRef<HTMLDivElement, CoverDesign10Props>(
         </div>
       </ResponsiveWrapper>
     );
-  }
+  },
 );
 CoverDesign10.displayName = "CoverDesign10";
 

@@ -21,8 +21,8 @@ const CoverDesign6 = forwardRef<HTMLDivElement, CoverDesign6Props>(
     {
       formData,
       className,
-      primary = "#1e3a8a", // indigo-800
-      accent = "#f97316", // orange-500
+      primary = "#1e40af", // indigo-800
+      accent = "#f59e0b", // orange-500
     },
     ref
   ) => {
